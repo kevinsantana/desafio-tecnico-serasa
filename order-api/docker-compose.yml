@@ -1,0 +1,6 @@
+version: '2'
+services:
+    redis_order:
+        image: sickp/alpine-redis:3.2.2
+        ports:
+            - "6380:6379"
