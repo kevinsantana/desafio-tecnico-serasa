@@ -1,0 +1,23 @@
+{        
+    "user": {
+        "user_id": 1,
+        "name": "ione da costa",
+        "cpf": "000.000.000-00",
+        "email": "ione.dacosta@example.com",
+        "phone_number": "1199999-9999",
+        "created_at": "2021-08-22 19:45:02.022807",
+        "updated_at": "2021-08-22 19:47:02.022807"
+    },
+    "orders": [
+        {
+            "object_id": "5fde4640555d6d1ea354d890",
+            "item_description": "An awesome item",
+            "item_quantity": 2,
+            "item_price": 5.99,
+            "total_value": 11.98,
+            "created_at": "2021-08-22 19:45:02.022807",
+            "updated_at": "None"
+        }
+
+    ]
+}
