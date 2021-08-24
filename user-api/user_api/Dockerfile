@@ -24,5 +24,5 @@ RUN pip install -e .
 # BUILD SPHINX DOCS
 RUN /bin/bash -cx 'cd docs; make clean; make html'
 
-CMD bash -c "cd user_api && gunicorn --workers=1 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --bind=0.0.0.0:7000 'app:start_application()'"
+CMD bash -c "cd user_api && gunicorn --workers=1 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:7000 'app:start_application()'"
 EXPOSE 7000

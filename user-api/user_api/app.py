@@ -17,6 +17,7 @@ from user_api import __version__
 from user_api.routes import v1
 from user_api.files import html_desc
 from user_api.routes.v1 import doc_sphinx
+# from user_api.database import create_database
 from user_api.exceptions import UserApiException
 from docs import (
     build_html_pages,
@@ -132,7 +133,7 @@ def http_middleware(app: FastAPI):
 
 def start_application():
     app = FastAPI(
-        title="HUBPAY-CADASTRO-PARCEIRO",
+        title="USER-API",
         description=open(html_desc).read(),
         version=__version__,
         docs_url="/v1/swagger",
@@ -149,4 +150,5 @@ def start_application():
         allow_credentials=True,
         allow_headers=["*"],
     )
+    # create_database(reset=False)
     return app

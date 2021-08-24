@@ -11,7 +11,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from user_api.config import envs
-# from user_api.exceptions.database import UpdateTableException
+from user_api.exceptions import ErrorDetails
+from user_api.exceptions.database import UpdateTableException
 
 Base = declarative_base()
 
@@ -146,13 +147,22 @@ class DataBaseCrud:
         for register in cls.search(
             connection, filter=filter, after=-1, is_active="all"
         ):
+            if hasattr(register, "updated_at"):
+                setattr(register, "updated_at", datetime.utcnow())
             for column, value in data.items():
                 try:
                     getattr(register, column)
                     setattr(register, column, value)
                 except AttributeError:
-                    raise Exception(
-                        f"Coluna {column} não encontrada na tabela {register}"
+                    raise UpdateTableException(
+                        status=404,
+                        error="Not Found",
+                        message="Campo não encontrado",
+                        error_details=[
+                            ErrorDetails(
+                                message=f"O campo {column} não existe"
+                            ).to_dict()
+                        ],
                     )
             updated_list.append(register)
 
@@ -210,8 +220,8 @@ class DataBaseCrud:
             attr_value = getattr(self, attr.name)
             if no_none and attr_value is None:
                 continue
-            if type(attr_value) is datetime:
-                attr_value = attr_value.strftime("%Y-%m-%d")
+            # if type(attr_value) is datetime:
+            #     attr_value = attr_value.strftime("%Y-%m-%d")
             elif type(attr_value) is Decimal:
                 attr_value = float(attr_value)
             else:

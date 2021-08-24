@@ -16,7 +16,7 @@ class ErrorDetails(BaseModel):
 
 class Message(BaseModel):
     status: int = Field(400, description="O status HTTP")
-    error: str = Field("Bad Request", description="A descrição do status HTTP.")
+    error: str = Field("Bad Request", description="A descrição do status HTTP")
     message: str = Field(
         "CPF é um campo obrigatório",
         description="Mensagem resumindo o erro",

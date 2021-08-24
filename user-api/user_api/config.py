@@ -6,6 +6,7 @@ from pydantic import BaseModel, BaseSettings, PostgresDsn, validator
 
 class EnvironmentEnum(Enum):
     LOCAL = "LOCAL"
+    PROD = "PROD"
 
 
 class DatabaseModel(BaseModel):
@@ -29,11 +30,12 @@ class DatabaseModel(BaseModel):
 
 
 class Envs(BaseSettings):
-    ENVIRONMENT: Optional[EnvironmentEnum] = EnvironmentEnum.LOCAL
+    ENVIRONMENT: Optional[Enum] = EnvironmentEnum.LOCAL
     RESET_DB: Optional[bool] = False
     SQLALCHEMY_ECHO: bool = True
-    # SQLALCHEMY_URI: str = DatabaseModel().DATABASE_URL
-    SQLALCHEMY_URI: str = "sqlite:///./sql_app.db"
+    SQLALCHEMY_TEST: str = "sqlite:///./sql_app.db"
+    SQLALCHEMY_DB_URI: str = DatabaseModel().DATABASE_URL
+    SQLALCHEMY_URI: str = SQLALCHEMY_TEST if ENVIRONMENT == EnvironmentEnum.LOCAL else SQLALCHEMY_DB_URI
 
     class Config:
         case_sensitive = True
