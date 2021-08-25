@@ -114,9 +114,7 @@ USER_DELETE_DEFAULT_RESPONSES = parse_openapi(
             status=404,
             error="Not Found",
             message="Usuário não encontrado",
-            error_details=[
-                ErrorDetails(message="Erro ao deletar o usuário").to_dict()
-            ],
+            error_details=[ErrorDetails(message="Erro ao deletar o usuário").to_dict()],
         ),
     ]
 )

@@ -2,6 +2,9 @@ FROM centos/python-38-centos7
 
 USER root
 
+# ENVS
+ENV SECRET_KEY=$SECRET_KEY
+
 # DEPENDENCIES
 RUN yum install -y \
         postgresql-devel\
@@ -16,6 +19,7 @@ COPY ./user_api /deploy/user_api
 COPY ./docs /deploy/docs
 COPY setup.py /deploy
 COPY /tests /deploy/tests
+COPY README.md /deploy
 
 WORKDIR /deploy
 

@@ -35,6 +35,10 @@ class MyDict(UserDict):
 
 
 class DatabaseService:
+    """
+    Provides an API to interact with sqlalchemy.
+    """
+
     def __init__(self):
         logger.info(f"db url {envs.SQLALCHEMY_URI}")
         self._sessao = SessionLocal()
@@ -51,10 +55,6 @@ class DatabaseService:
     def remove(self):
         return self._sessao.delete
 
-    @property
-    def bulk_insert(self):
-        return self._sessao.bulk_save_objects
-
     def commit(self):
         self._sessao.commit()
 
@@ -69,7 +69,9 @@ class DatabaseService:
 
 
 class DataBaseCrud:
-    parser: dict = None
+    """
+    Provide an API to make basic database operations (crud).
+    """
 
     @classmethod
     def list_one(
@@ -78,6 +80,15 @@ class DataBaseCrud:
         filter: tuple = None,
         order_by: tuple = None,
     ):
+        """
+        Find and return the first record on database with provided filter.
+
+        :param connection: The connection to database.
+        :param tuple filter: Filter to apply on query.
+        :param tuple order_by: If the result query should be order in the given way.
+        :return: Found record.
+        :rtype: sqlalchemy.query
+        """
         query = connection.query(cls)
 
         if filter:
@@ -100,12 +111,22 @@ class DataBaseCrud:
         quantity: int = 100,
         is_active: str_or_bool = True,
     ) -> Generator:
+        """
+        Find and return all records on database with given filter.
+
+        :param connection: Connection to database.
+        :param int page: Query offset.
+        :param int quantity: Result quantity in returned page.
+        :param bool is_active: Returns only active records with column 'is_active'.
+        :return: Query result.
+        :rtype: generator
+        """
         query = connection.query(cls)
 
         if "is_active" in dir(cls) and is_active != "all":
             query = query.filter(*(cls.is_active == is_active,))
 
-        offset = (page-1)*quantity
+        offset = (page - 1) * quantity
         yield from query.limit(quantity).offset(offset)
 
     @classmethod
@@ -118,6 +139,18 @@ class DataBaseCrud:
         is_active: str_or_bool = True,
         order_by: tuple = None,
     ) -> Generator:
+        """
+        Search for all records with given filter.
+
+        :param connection: Connection to database.
+        :param tuple filter: Filter to apply on query.
+        :param int after: How many records should be skipped in result query.
+        :param int limit: Result query limit.
+        :param bool is_active: Returns only active records with column 'is_active'.
+        :param tuple order_by: If the result query should be order in the given way.
+        :return: Query result.
+        :rtype: generator
+        """
         query = connection.query(cls)
 
         if "is_active" in dir(cls) and is_active != "all":
@@ -143,7 +176,17 @@ class DataBaseCrud:
         return connection.query(cls).join(table)
 
     @classmethod
-    def update(cls, connection: DatabaseService, filter: tuple, data: dict) -> int:
+    def update(cls, connection: DatabaseService, filter: tuple, data: dict) -> list:
+        """
+        Update a given record on database.
+
+        :param connection: Connection to database.
+        :param tuple filter: Filter to apply on query.
+        :param dict data: The columns and values to be updated.
+        :return: List containing all updated records.
+        :rtype: list
+        :raises UpdateTableException: If a given column could not be found on database record.
+        """
         updated_list = list()
         for register in cls.search(
             connection, filter=filter, after=-1, is_active="all"
@@ -172,11 +215,22 @@ class DataBaseCrud:
         return updated_list
 
     def insert(self, connection: DatabaseService):
+        """
+        Insert record on database. The object should be a parent of DatabaseCrud class.
+
+        :param connection: Database connection.
+        :return: Self
+        """
         connection.add(self)
         connection.commit()
         return self
 
     def delete(self, connection: DatabaseService):
+        """
+        Delete record on database. The object should be a parent of DatabaseCrud class.
+
+        :param connection: Database connection.
+        """
         connection.remove(self)
         connection.commit()
 
@@ -202,6 +256,13 @@ class DataBaseCrud:
         return class_attr_dict
 
     def to_dict(self, no_fk: bool = True, no_none: bool = True, no_id: bool = True):
+        """
+        Makes a dictionary out of an DataBaseCrud object instance.
+
+        :param bool no_fk: Whether or not to include fk columns in final dict.
+        :param bool no_none: Whether or not to include null columns in final dict.
+        :param bool no_id: Whether or not to include id columns in final dict.
+        """
         return self.__parse_table(no_fk, no_none, no_id)
 
     def __repr__(self):

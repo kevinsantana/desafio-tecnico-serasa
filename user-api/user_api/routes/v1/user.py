@@ -1,7 +1,4 @@
-import json
-
 from fastapi import APIRouter, Body, Query, Request
-from loguru import logger
 
 from user_api.business import user as usr
 from user_api.routes.v1 import pagination
@@ -16,13 +13,8 @@ from user_api.models.user import (
     UserUpdateResponse,
     USER_UPDATE_DEFAULT_RESPONSES,
 )
-from user_api.models.user import(
-    UserDeleteResponse,
-    USER_DELETE_DEFAULT_RESPONSES
-)
-from user_api.models.user import (
-    ListUsersResponse, USER_LIST_DEFAULT_RESPONSES
-)
+from user_api.models.user import UserDeleteResponse, USER_DELETE_DEFAULT_RESPONSES
+from user_api.models.user import ListUsersResponse, USER_LIST_DEFAULT_RESPONSES
 
 router = APIRouter()
 
@@ -31,7 +23,7 @@ router = APIRouter()
     "/",
     status_code=201,
     summary="Insere um usuário",
-    # response_model=UserCreateResponse,
+    response_model=UserCreateResponse,
     responses=USER_CREATE_DEFAULT_RESPONSES,
 )
 def create(

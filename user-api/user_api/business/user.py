@@ -1,4 +1,3 @@
-from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
 from user_api.exceptions import ErrorDetails
@@ -14,6 +13,14 @@ from user_api.database.database_service import DatabaseService
 
 
 def insert_user(user: user_entity) -> int:
+    """
+    Insert user on database. Encrypts sensive data before insertion.
+
+    :param user_entity user: The user to be inserted.
+    :return: User id inserted on database
+    :rtype: int
+    :raises UserAlreadyInserted: User cpf_number already present on database
+    """
     with DatabaseService() as conn:
         try:
             user.cpf = user.cpf.replace(".", "").replace("-", "")
@@ -34,6 +41,15 @@ def insert_user(user: user_entity) -> int:
 
 
 def update_user(id_user: int, update_data: dict):
+    """
+    Update user data on database.
+
+    :param int id_user: User to be updated.
+    :param dict update_data: Data to be modified.
+    :return: True if the user is successful updated.
+    :rtype: bool
+    :raises UpdateUserException: The provided user cannot be found on database
+    """
     with DatabaseService() as conn:
         database_filter = (user_entity.id_user == id_user,)
         updated_list = user_entity.update(
@@ -55,6 +71,14 @@ def update_user(id_user: int, update_data: dict):
 
 
 def delete_user(id_user: int):
+    """
+    Delete user on database.
+
+    :param int id_user: User to be deleted.
+    :return: True when user is successful deleted.
+    :rtype: bool
+    :raises DeleteUserException: User cannot be found.
+    """
     with DatabaseService() as conn:
         database_filter = (user_entity.id_user == id_user,)
         user = user_entity.list_one(conn, database_filter)
@@ -75,6 +99,14 @@ def delete_user(id_user: int):
 
 
 def list_one(id_user: int):
+    """
+    Find provided user on database.
+
+    :param int id_user: User to be found
+    :return: Found user
+    :rtype: dict
+    :raises GetUserException: Provided user cannot be found.
+    """
     with DatabaseService() as conn:
         database_filter = (user_entity.id_user == id_user,)
         user = user_entity.list_one(conn, database_filter)
@@ -94,6 +126,14 @@ def list_one(id_user: int):
 
 
 def list_all(quantity: int, page: int):
+    """
+    List all users on database. The result is paginate.
+
+    :param int quantity: User per page.
+    :param int page: Actual page of result.
+    :return: List with all users found on database
+    :rtype: list
+    """
     with DatabaseService() as conn:
         users = [
             user.decrypt().to_dict()
