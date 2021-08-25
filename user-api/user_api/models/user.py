@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, Field
 from user_api.exceptions import ErrorDetails
 
-from user_api.models import Message, parse_openapi
+from user_api.models import Message, parse_openapi, Pagination
 
 
 # TODO: regex no e-mail
@@ -64,7 +64,20 @@ class UserUpdateRequest(BaseModel):
 
 
 class UserUpdateResponse(BaseModel):
-    update: bool
+    result: bool
+
+
+class UserDeleteResponse(BaseModel):
+    result: bool
+
+
+class GetUserResponse(BaseModel):
+    result: UserCreateRequest
+
+
+class ListUsersResponse(BaseModel):
+    result: List[UserCreateRequest]
+    pagination: Pagination = Field(..., description="Dados de paginação")
 
 
 USER_CREATE_DEFAULT_RESPONSES = parse_openapi(
@@ -94,3 +107,19 @@ USER_UPDATE_DEFAULT_RESPONSES = parse_openapi(
         ),
     ]
 )
+
+USER_DELETE_DEFAULT_RESPONSES = parse_openapi(
+    [
+        Message(
+            status=404,
+            error="Not Found",
+            message="Usuário não encontrado",
+            error_details=[
+                ErrorDetails(message="Erro ao deletar o usuário").to_dict()
+            ],
+        ),
+    ]
+)
+
+
+USER_LIST_DEFAULT_RESPONSES = parse_openapi([])

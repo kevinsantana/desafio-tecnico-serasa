@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from typing import Any, Dict, Optional
 
@@ -36,6 +37,7 @@ class Envs(BaseSettings):
     SQLALCHEMY_TEST: str = "sqlite:///./sql_app.db"
     SQLALCHEMY_DB_URI: str = DatabaseModel().DATABASE_URL
     SQLALCHEMY_URI: str = SQLALCHEMY_TEST if ENVIRONMENT == EnvironmentEnum.LOCAL else SQLALCHEMY_DB_URI
+    SECRET_KEY: str = os.environ.get("SECRET_KEY", None)
 
     class Config:
         case_sensitive = True

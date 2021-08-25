@@ -3,6 +3,14 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+class Pagination(BaseModel):
+    next: str = Field(..., description="Proxima página com resultados")
+    previous: str = Field(..., description="Página anterior com resultados")
+    first: str = Field(..., description="Primeira página que contem resultados")
+    last: str = Field(..., description="Última página que contem resultados")
+    total: int = Field(..., description="Quantidade total de páginas")
+
+
 class ErrorDetails(BaseModel):
     unique_id: str = Field(
         str(uuid4()),

@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 from collections import UserDict
-from typing import Generator, TypeVar, Iterable
+from typing import Generator, TypeVar
 
 from loguru import logger
 
@@ -96,8 +96,8 @@ class DataBaseCrud:
     def find_all(
         cls,
         connection: DatabaseService,
-        after: int = 0,
-        limit: int = 100,
+        page: int = 0,
+        quantity: int = 100,
         is_active: str_or_bool = True,
     ) -> Generator:
         query = connection.query(cls)
@@ -105,7 +105,8 @@ class DataBaseCrud:
         if "is_active" in dir(cls) and is_active != "all":
             query = query.filter(*(cls.is_active == is_active,))
 
-        yield from query.offset(after).limit(limit)
+        offset = (page-1)*quantity
+        yield from query.limit(quantity).offset(offset)
 
     @classmethod
     def search(
@@ -174,35 +175,6 @@ class DataBaseCrud:
         connection.add(self)
         connection.commit()
         return self
-
-    @classmethod
-    def _before_bulk_insert(cls, iterable, *args, **kwargs):
-        pass
-
-    @classmethod
-    def _after_bulk_insert(cls, iterable, *args, **kwargs):
-        pass
-
-    @classmethod
-    def bulk_insert(
-        cls,
-        connection: DatabaseService,
-        iterable: Iterable,
-        commit: bool = True,
-        *args,
-        **kwargs,
-    ) -> Iterable:
-        cls._before_bulk_insert(iterable)
-        models_objs = []
-        for data in iterable:
-            if not isinstance(data, cls):
-                data = cls(**data)
-            models_objs.append(data)
-        connection.bulk_insert(models_objs)
-        if commit:
-            connection.commit()
-        cls._after_bulk_insert(iterable)
-        return models_objs
 
     def delete(self, connection: DatabaseService):
         connection.remove(self)

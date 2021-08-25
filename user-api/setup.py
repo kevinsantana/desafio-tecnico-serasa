@@ -21,7 +21,7 @@ run_requirements = [
     "pytest==6.2.4",
     "sphinx-autobuild==0.7.1",
     "SQLAlchemy==1.4.20",
-    "alembic==1.6.5",
+    "cryptography==3.4.8"
     # "psycopg2==2.9.1",
 ]
 
