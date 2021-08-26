@@ -1,6 +1,60 @@
-version: '2'
+version: "3.5"
+
 services:
-    redis_user:
-        image: sickp/alpine-redis:3.2.2
-        ports:
-            - "6379:6379"
+  user_api:
+    container_name: user_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: user_api:0.1.0
+    environment: 
+      - SECRET_KEY
+    volumes:
+      - .:/deploy
+    working_dir: /deploy
+    command: >
+        bash -cx "cd docs; make clean; make html; cd .. &&
+        cd user_api &&
+        gunicorn --workers=3 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --bind=0.0.0.0:7000 'app:start_application()'"
+    ports:
+      - 7000:7000
+    networks:
+      - user-network
+    depends_on:
+      - db_user
+  
+  db_user:
+    container_name: db_user
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_DB=userapi
+      - POSTGRES_PASSWORD=userapi
+      - POSTGRES_USER=userapi
+    ports:
+      - 15432:5432
+    volumes:
+      - vdb_user:/var/lib/postgresql/data/
+    networks:
+      - user-network
+
+  pgadmin_userapi:
+    container_name: pgadmin_userapi
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=userapi@tivit.com
+      - PGADMIN_DEFAULT_PASSWORD=userapi
+    ports:
+      - 8032:80
+    depends_on:
+      - db_user
+    networks:
+      - user-network
+
+networks:
+  user-network:
+    name: user-network
+    driver: bridge
+
+volumes:
+    vdb_user:

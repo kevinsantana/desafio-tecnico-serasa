@@ -11,11 +11,11 @@ class EnvironmentEnum(Enum):
 
 
 class DatabaseModel(BaseModel):
-    DATABASE_USER: str = "users"
-    DATABASE_PASS: str = "users"
-    DATABASE_HOST: str = "db_users"
+    DATABASE_USER: str = "userapi"
+    DATABASE_PASS: str = "userapi"
+    DATABASE_HOST: str = "db_user"
     DATABASE_PORT: str = "5432"
-    DATABASE_NAME: str = "users"
+    DATABASE_NAME: str = "userapi"
     DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
     @validator("DATABASE_URL", pre=True)
@@ -31,7 +31,7 @@ class DatabaseModel(BaseModel):
 
 
 class Envs(BaseSettings):
-    ENVIRONMENT: Optional[Enum] = EnvironmentEnum.LOCAL
+    ENVIRONMENT: Optional[Enum] = EnvironmentEnum.PROD
     RESET_DB: Optional[bool] = False
     SQLALCHEMY_ECHO: bool = True
     SQLALCHEMY_TEST: str = "sqlite:///./sql_app.db"
