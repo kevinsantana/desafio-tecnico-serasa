@@ -1,6 +1,49 @@
-version: '2'
+version: "3.5"
+
 services:
-    redis_order:
-        image: sickp/alpine-redis:3.2.2
-        ports:
-            - "6380:6379"
+  order_api:
+    container_name: order_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: order_api:0.1.0
+    volumes:
+      - .:/deploy
+    working_dir: /deploy
+    command: >
+        bash -cx "cd docs; make clean; make html; cd .. &&
+        cd order_api &&
+        gunicorn --workers=3 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:8000 'app:start_application()'"
+    ports:
+      - 8000:8000
+    networks:
+      - order-network
+      - user-network
+    depends_on:
+      - db_orders
+  
+  db_orders:
+    container_name: db_orders
+    image: elasticsearch:7.14.0
+    restart: always
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - order-network
+
+networks:
+  order-network:
+    name: order-network
+    driver: bridge
+  user-network:
+    external: true
+    name: user-network
+
+volumes:
+  data01:
+    driver: local

@@ -1,7 +1,7 @@
 # Source: https://packaging.python.org/guides/distributing-packages-using-setuptools/
 
 from os import path
-from user_api import __version__
+from order_api import __version__
 from setuptools import find_packages, setup
 
 run_requirements = [

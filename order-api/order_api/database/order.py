@@ -1,6 +1,8 @@
 from uuid import uuid4
 from datetime import datetime
 
+from loguru import logger
+
 from order_api.database import Database
 
 
@@ -45,46 +47,82 @@ class Order(Database):
 
     @property
     def created_at(self):
-        return self.__created_at
+        return str(self.__created_at)
 
     @property
     def updated_at(self):
-        return self.__updated_at
+        return str(self.__updated_at)
 
     @created_at.setter
-    def created_at(self):
-        self.__created_at = datetime.utcnow()
+    def created_at(self, created_at: datetime):
+        if isinstance(created_at, datetime):
+            self.__created_at = created_at
 
-    def dict(self, no_id: bool = False, no_version: bool = False) -> dict:
+    @updated_at.setter
+    def updated_at(self, updated_at: datetime):
+        if isinstance(updated_at, datetime):
+            self.__updated_at = updated_at
+
+    def dict(self) -> dict:
         new_dict = dict()
         for key, value in self.__dict__.items():
-            if no_id and key.startswith("_id"):
+            if value and key.startswith("_Order__"):
+                new_dict[key.replace("_Order__", "")] = value
+            if not value:
                 continue
-            if no_version and key.startswith("_version"):
-                continue
-            if key not in {"_id", "_version"} and key.startswith("_"):
-                continue
-            new_dict[key] = value
         return new_dict
 
     def insert(
         self,
-        type: str,
         id: str = str(uuid4()),
         index: str = "orders",
         doc_type: str = "order",
     ):
-        if type not in {"create", "update"}:
-            raise ValueError("Metodo nao permitido")
+        """
+        Insert.
+        """
         if not self.__created_at:
-            self.created_at = self.created_at
-        insertion = super().insert(
-            document=self,
-            id=id,
-            index=index,
-            doc_type=doc_type
-        ).dict()
-        return insertion.get("_id") if type == "create" else insertion.get("version")
+            self.created_at = datetime.utcnow()
+        return super().insert(
+            document=self.dict(), id=id, index=index, doc_type=doc_type
+        )
+
+    def update(
+        self,
+        id: int,
+        index: str = "orders",
+        doc_type: str = "order",
+    ):
+        """
+        Update
+        """
+        if not self.__updated_at:
+            self.updated_at = datetime.utcnow()
+        return super().update(
+            doc=self.dict(), id=id, index=index, doc_type=doc_type
+        )
+
+    def find_by_id(
+        self,
+        id: str,
+        index: str = "orders",
+        doc_type: str = "order",
+    ):
+        """
+        Find by id
+        """
+        return super().list_one(id, index, doc_type)
+
+    def delete(
+        self,
+        id: str,
+        index: str = "orders",
+        doc_type: str = "order",
+    ):
+        """
+        Delete
+        """
+        return super().delete(id, index, doc_type)
 
     def __repr__(self):
         return f"{self.__dict__.items()}"
