@@ -1,10 +1,10 @@
 from enum import Enum
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 from order_api.exceptions import ErrorDetails
 
-from order_api.models import Message, parse_openapi
+from order_api.models import Message, parse_openapi, Pagination
 
 
 class IndexType(str, Enum):
@@ -32,6 +32,7 @@ class GetOrder(BaseModel):
     item_description: str = Field(..., description="Descrição do item")
     item_quantity: int = Field(..., description="Quantidade de itens")
     item_price: float = Field(..., description="Valor do item")
+    total_value: float = Field(7.50, description="Valor total do pedido")
     created_at: str = Field(..., description="Data de criação do pedido")
     updated_at: Optional[str] = Field(None, description="Data de alteração do pedido")
 
@@ -56,6 +57,36 @@ class UpdateOrderResponse(BaseModel):
 
 class DeleteOrderResponse(BaseModel):
     result: str
+
+
+class Order(BaseModel):
+    id: str = Field(..., description="Id do pedido")
+    item_description: str = Field(..., description="Descrição do item")
+    item_quantity: int = Field(..., description="Quantidade de itens")
+    item_price: float = Field(..., description="Valor do item")
+    total_value: float = Field(7.50, description="Valor total do pedido")
+    created_at: str = Field(..., description="Data de criação do pedido")
+    updated_at: Optional[str] = Field(None, description="Data de alteração do pedido")
+
+
+class User(BaseModel):
+    id_user: int = Field(..., description="Id do usuário associado ao pedido")
+    name: str = Field(..., description="Nome completo")
+    cpf: str = Field(..., description="Cadastro de pessoa física(CPF)")
+    email: Optional[str] = Field(..., description="E-mail")
+    phone_number: str = Field(..., description="Número do telefone")
+    created_at: str = Field(..., description="Data de criação do usuário")
+    updated_at: Optional[str] = Field(None, description="Data de alteração do usuário")
+
+
+class ListOrders(BaseModel):
+    user: User
+    orders: List[Order]
+
+
+class ListOdersResponse(BaseModel):
+    result: ListOrders
+    pagination: Pagination = Field(..., description="Dados de paginação")
 
 
 INSERT_ORDER_DEFAULT_RESPONSES = parse_openapi(
@@ -134,3 +165,5 @@ DELETE_ORDER_DEFAULT_RESPONSES = parse_openapi(
         ),
     ]
 )
+
+LIST_ORDERS_DEFAULT_RESPONSES = parse_openapi([])

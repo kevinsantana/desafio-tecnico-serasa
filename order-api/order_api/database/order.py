@@ -98,9 +98,7 @@ class Order(Database):
         """
         if not self.__updated_at:
             self.updated_at = datetime.utcnow()
-        return super().update(
-            doc=self.dict(), id=id, index=index, doc_type=doc_type
-        )
+        return super().update(doc=self.dict(), id=id, index=index, doc_type=doc_type)
 
     def find_by_id(
         self,
@@ -123,6 +121,23 @@ class Order(Database):
         Delete
         """
         return super().delete(id, index, doc_type)
+
+    def find_all(
+        self,
+        quantity: int = 10,
+        page: int = 0,
+        index: str = "orders",
+        doc_type: str = "order",
+    ):
+        """
+        Find all
+        """
+        return super().list_all(
+            quantity=quantity,
+            page=page,
+            index=index,
+            doc_type=doc_type,
+        )
 
     def __repr__(self):
         return f"{self.__dict__.items()}"

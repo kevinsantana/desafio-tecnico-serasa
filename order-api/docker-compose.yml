@@ -36,6 +36,18 @@ services:
     networks:
       - order-network
 
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: redis-server
+    ports:
+      - "6379:6379"
+    networks:
+      - order-network
+    volumes:
+      - redis-data:/data
+      - redis-conf:/usr/local/etc/redis/redis.conf
+
 networks:
   order-network:
     name: order-network
@@ -46,4 +58,8 @@ networks:
 
 volumes:
   data01:
+    driver: local
+  redis-data:
+    driver: local
+  redis-conf:
     driver: local

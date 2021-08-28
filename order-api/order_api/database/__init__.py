@@ -10,7 +10,7 @@ from order_api.exceptions import ErrorDetails
 from order_api.exceptions.order import (
     OrderAlreadyInsertedException,
     OrderNotFoundException,
-    UpdateOrderException
+    UpdateOrderException,
 )
 
 
@@ -98,11 +98,7 @@ class Database:
                 status=400,
                 error="Bad Request",
                 message="Campo inválido",
-                error_details=[
-                    ErrorDetails(
-                        message=f"O campo não existe"
-                    ).to_dict()
-                ],
+                error_details=[ErrorDetails(message=f"O campo não existe").to_dict()],
             )
         except elasticsearch.exceptions.NotFoundError:
             raise OrderNotFoundException(
@@ -140,6 +136,24 @@ class Database:
             )
         self.__disconnect()
         return response
+
+    def list_all(
+        self,
+        quantity: int = 10,
+        page: int = 0,
+        index: str = "orders",
+        doc_type: str = "order",
+    ):
+        offset = (page - 1) * quantity
+        document = {"query": {"match_all": {}}}
+        self.__connect()
+        response = self.__es.search(
+            body=document, index=index, doc_type=doc_type, from_=offset, size=quantity
+        )
+        total = self.__es.count(body=document, index=index, doc_type=doc_type).get(
+            "count"
+        )
+        return response.get("hits").get("hits"), total
 
     @abc.abstractclassmethod
     def dict(self):

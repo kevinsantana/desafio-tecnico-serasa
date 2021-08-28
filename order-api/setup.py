@@ -20,7 +20,8 @@ run_requirements = [
     "starlette==0.14.2",
     "pytest==6.2.4",
     "sphinx-autobuild==0.7.1",
-    "elasticsearch==7.14.0"
+    "elasticsearch==7.14.0",
+    "redis>=3.5.3"
 ]
 
 here = path.abspath(path.dirname(__file__))

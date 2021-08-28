@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from typing import Optional
 
@@ -16,6 +17,7 @@ class Envs(BaseSettings):
     DB_PORT: str = 9200
     ENVIRONMENT: Optional[Enum] = EnvironmentEnum.PROD
     USER_API_ADDRESS: str = "http://user_api:7000"
+    REDIS_URL = os.getenv("REDIS_URL", "redis")
 
     class Config:
         case_sensitive = True

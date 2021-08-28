@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Path, Body
+from fastapi import APIRouter, Path, Body, Request, Query
 
 from order_api.business import order
+from order_api.routes.v1 import pagination
 
 from order_api.models.order import IndexType, DocType
 from order_api.models.order import (
@@ -14,6 +15,7 @@ from order_api.models.order import (
     UpdateOrderResponse,
     UPDATE_ORDER_DEFAULT_RESPONSES,
 )
+from order_api.models.order import ListOdersResponse, LIST_ORDERS_DEFAULT_RESPONSES
 from order_api.models.order import DeleteOrderResponse, DELETE_ORDER_DEFAULT_RESPONSES
 
 router = APIRouter()
@@ -66,7 +68,7 @@ def list_one_by_id(
 
 
 @router.put(
-    "{index}/{doc_type}/{id}",
+    "/{index}/{doc_type}/{id}",
     status_code=200,
     summary="Atualizar um pedido",
     response_model=UpdateOrderResponse,
@@ -94,7 +96,7 @@ def update(
 
 
 @router.delete(
-    "{index}/{doc_type}/{id}",
+    "/{index}/{doc_type}/{id}",
     status_code=200,
     summary="Deletar um pedido",
     response_model=DeleteOrderResponse,
@@ -109,3 +111,29 @@ def delete(
     Deleta um pedido
     """
     return {"result": order.delete_order(index, doc_type, id)}
+
+
+@router.get(
+    "/{index}/{doc_type}/",
+    status_code=200,
+    summary="Listar todos os pedidos",
+    response_model=ListOdersResponse,
+    responses=LIST_ORDERS_DEFAULT_RESPONSES,
+)
+def get_orders(
+    request: Request,
+    quantity: int = Query(10, description="Quantidade de registros de retorno", gt=0),
+    page: int = Query(1, description="Página atual de retorno", gt=0),
+    index: IndexType = Path(..., description="Index do pedido"),
+    doc_type: DocType = Path(..., description="Document type do pedido"),
+):
+    """
+    Listar todos os pedidos, paginando o resultado.
+    """
+    orders, total = order.list_orders(
+        quantity=quantity,
+        page=page,
+        index=index,
+        doc_type=doc_type,
+    )
+    return pagination(orders, quantity, page, total, str(request.url))
