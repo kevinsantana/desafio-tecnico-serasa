@@ -1,88 +1,103 @@
 # Serasa Consumidor - Teste para analista desenvolvedor
 
-Olá, obrigado pelo interesse em fazer parte da nossa equipe.  
+O ecossistema é composto por dois microsserviços:
 
-O objetivo deste teste é verificar (até certo ponto) suas habilidades de codificação e arquitetura. Para isso você receberá um problema simples onde poderá mostrar suas técnicas de desenvolvimento.
+* [order-api](order-api)
+* [user-api](user-api)
 
-Nós encorajamos você a exagerar um pouco na solução para mostrar do que você é capaz.
+O primeiro microsserviço mantém pedidos, enquanto o segundo mantém usuários. Os microsserviço de usuários foi desenvolvido utilizando `sqlalchemy` já o microsserviço de pedidos foi utilizada uma liberdade filósofica maior, utilizando-se de conceitos de OO para criar uma API de interação com o banco de dados `Elasticsearch`.
 
-Considere um cenário em que você esteja construindo uma aplicação pronta para produção, onde outros desenvolvedores precisarão trabalhar e manter essa aplicação ao longo do tempo.  
+O projeto não segue a risca os conceitos de `Clean Architecture`, no entanto, tenta ao máxima seguir a sua filosofia, uma vez que possuí de forma desacoplada seus módulos, classes e métodos.
 
-Você **PODE** e **DEVE** usar bibliotecas de terceiros, usando ou não um framework, você decide. Lembre-se, um desenvolvedor eficaz sabe o que construir e o que reutilizar.
+Na pasta [architecture](architecture) podem ser encontrados desenhos técnicos dos banco de dados pensados, da sua modelaem e da arquitetura do sistema como um todo. Serve também como uma visão geral do que o sistema é e o que executa.
 
-Na entrevista de "code review", esteja preparado para responder algumas perguntas sobre essas bibliotecas e, caso utilize, sobre o framework. Como e por que você as escolheu e com quais outras alternativas você está familiarizado, serão algumas dessas perguntas.
+## Arquitetura
 
-Como este é um processo de "code review", evite adicionar código gerado ao projeto.
+Para garantir a segurança da aplicação, o [Kong](https://konghq.com/kong/) foi utilizado juntamente com o [Keycloak](https://www.keycloak.org/) de tal maneira que a raíz do _endpoints_ dos microsserviços apontariam para o `Kong` que através de um plugin com o `Keycloak` requisitaria um Single Sign On (Keycloak) gerando uma autenticação simples de usuário/senha e um [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) seria gerado e assinado pelo `Kong`. Assim o ecossitema da aplicação ficaria protegido contra terceiros mal intecionados.
 
-***Obs***: Para realizar esse teste, não crie um repositório público! Esse desafio é compartilhado apenas com pessoas que estamos entrevistando e gostaríamos que permanecesse assim.  
+A arquiterua abaixo exibe como se daria essa dinâmica.
 
+![Arquitetura](architecture/users_orders-desenho_técnico.jpg)
 
-Aqui no Serasa Consumidor, nós utilizamos o [Docker](https://www.docker.com/products/docker) para executar as aplicações, por isso, pedimos que você faça o mesmo neste teste. Isso garante que tenhamos um resultado idêntico ao seu quando testarmos sua aplicação.
+Dentro da arquitetura foi pensada também uma camada de _cache_ com [Redis](https://redis.io/) em que as chamadas ao banco de dados do microsserviço de pedidos passaria primeiro pelo cache checando se o dados buscado já existe, evitando uma chamada desnecesária e custosa ao banco de dados.
 
-Para facilitar o teste, disponibilizamos alguns containters que vão lhe ajudar a construir e executar suas aplicações, mas fique à vontade para alterá-los conforme preferir!
+A arquitetura proposta pode ser verificada em detalhes abaixo
 
-Para executá-los é fácil, acesse o diretório `user-api` e execute o comando: `docker-compose -up -d` e em seguida acesse o diretório `order-api` e execute o mesmo comando: `docker-compose -up -d`
+![Arquitetura Detalhada](architecture/users_orders-sequencia_eventos.jpg)
 
-## Requisitos mínimos para o teste:
+## Documentação
 
-- Persistência de dados em banco relacional e não relacional. Pode ser MySQL ou PostgreeSQL e queremos ver você utilizar Elastic Search!
-- Camada de cache em memória. Pode ser Redis, Memcached, ou APCU.
-- Utilização de um ORM para manipulação dos dados.
-- Testes unitários.
-- Documentação de setup e do funcionamento das APIs (um Makefile cai muito bem!).
-- Caso decida utilizar um framework, utilize um  micro-framework, você está construindo microsserviços!
+Todo o código foi documentado utilizando `Sphinx`, é possível acessar a documentação técnica do projeto acessando os endpoints abaixo:
 
-## Instruções
+* [order-api](http://localhost:8000/)
+* [user-api](http://localhost:7000/)
 
-- Clone este repositório.
-- Crie uma nova branch chamada `dev`
-- Desenvolva as aplicações.
-- Crie uma "pull request" da branch `dev` para a "branch" `master`. Essa PR deve conter as instruções para executarmos as suas aplicações, as tecnologias que você decidiu usar, por que decidiu utilizá-las e também as decisões que você teve quanto ao design do seu código.
+## Pré-requisitos
 
+Para executar o projeto é preciso que [docker](https://docs.docker.com/) e o [docker-compose](https://docs.docker.com/compose/) estejam devidamente configurados, e que uma `SECRET_KEY` seja gerada. Para isto é possível utilizar a função [generate_key](user-api/user_api/utlis/cryptography.py) e exportar a chave como variável de ambiente com o nome `SECRET_KEY no terminal que vai executá-lo.
 
-## Requisitos das aplicações:
+## Execução
 
-Nós desejamos que você crie 2 aplicações básicas (microserviços) que comuniquem-se entre si.
+Com o `docker`, `docker-compose` e a variável de ambiente `SECRET-KEY` exportada no seu terminal, basta executar:
 
-O primeiro deles deverá ser um cadastro de usuários, contendo os seguintes recursos:
+```bash
+make run
+```
 
-- Listar, exibir, criar, alterar e excluir usuários  
+Para rodar o projeto completo, ou, caso deseje, é possível rodar cada microsserviço separadamente, desta maneira:
 
-Tabela de usuários `user` deverá conter os campos: id, name, cpf, email, phone_number, created_at, updated_at  
+```bash
+make user
+```
 
-E o segundo deverá ser um serviço de pedidos, onde este deverá conter o id do usuário que fez o pedido e se comunicar com o serviço de usuários para retornar as informações do mesmo. Esse serviço deverá ter os seguintes recursos:
+Para rodar o microsserviço `user-api` e
 
-- Listar, Listar por usuário, exibir, criar, alterar e excluir.  
+```bash
+make order
+```
 
-Tabela de pedidos `order` deverá conter os campos: id, user_id, item_description, item_quantity, item_price, total_value, created_at, updated_at  
+Para rodar o microsserviço `order-api`
 
+## Estilo de código
 
-Lembre-se de fazer a comunicação necessária entre os serviços para garantir a consistência de dados.  
+Esse código segue o padrão PEP8 e pode ser testado com a biblioteca [PyLama](https://github.com/klen/pylama) como no exemplo a seguir
 
-Essas aplicações também **DEVEM** estar de acordo com os padrões REST e **DEVE** ser disponibilizada uma documentação contendo os endpoints e payloads utilizados nas requisições.
+```bash
+make lint
+```
 
+### Autoformatter
 
-## Critérios de avaliação
+O projeto conta com o [Black](https://github.com/psf/black) que é um `autoformatter`, formatando o código caso exista algum trecho de código que não siga a PEP8. Para executá-lo basta rodar o seguinte comando no terminal:
 
-Dê uma atenção especial aos seguintes aspectos:
+```bash
+make black
+```
 
-- Você **DEVE** usar bibliotecas de terceiros, e pode escolher usar um framework, utilizar não vai ser uma penalidade, mas você vai precisar justificar a sua escolha.
-- Suas aplicações **DEVEM** executar em containers Docker.
-- Suas aplicações **DEVEM** retornar um JSON válido e **DEVEM** conter os recursos citados anteriormente.
-- Você **DEVE** escrever um código testável e demonstrar isso escrevendo testes unitários.
-- Você **DEVE** prestar atenção nas melhores práticas para segurança de APIs.
-- Você **DEVE** seguir as diretizes de estilo de código.
-- Você **NÃO** precisa desenvolver um "frontend" (telas) para esse teste.
+## Deploy
 
-Pontos que consideramos um bônus:
+Com a aplicação _dockerizada_ e testada, é possível efetuar o _deploy_ em um orquestrador de _containers_ a exemplo do [Kubernetes](https://kubernetes.io/pt/), ou mesmo, com o orquestrador nativo do Docker [Swarm](https://docs.docker.com/engine/swarm/).
 
-- Fazer uso de uma criptografia reversível de dados sensíveis do usuário, como: email, cpf e telefone, antes de persisti-los no banco de dados
-- Suas respostas durante o code review
-- Sua descrição do que foi feito na sua "pull request"
-- Setup da aplicação em apenas um comando ou um script que facilite esse setup
-- Outros tipos de testes, como: testes funcionais e de integração
-- Histórico do seus commits, com mensagens descritivas do que está sendo desenvolvido.
+## Construído Com
 
----
+* [black](https://github.com/psf/black)
+* [loguru](https://github.com/Delgan/loguru)
+* [Elasticsearch](https://www.elastic.co/elasticsearch/)
+* [pydantic](https://pydantic-docs.helpmanual.io)
+* [fastapi](https://fastapi.tiangolo.com)
+* [uvicorn](https://www.uvicorn.org)
+* [gunicorn](https://gunicorn.org)
+* [requests](https://requests.readthedocs.io/en/master/)
+* [sphinx](https://www.sphinx-doc.org/en/master/)
 
-Boa sorte!
+## Versionamento
+
+O versionamento segue o padrão do [Versionamento Semântico](http://semver.org/).
+
+## License
+
+Todos os direitos são reservados ao autor Kevin de Santana Araujo.
+
+## Outras informações
+
+* Caso tenha alguma dúvida em relação ao projeto, ou queira contribuir com sugestões ou críticas, abra uma [issue]() ou procure o desenvolvedor através do email kevin_santana.araujo@hotmail.com

@@ -1,5 +1,8 @@
 from cryptography.fernet import Fernet
 
+from user_api.exceptions import ErrorDetails
+from user_api.exceptions.cryptography import EmptySecretKeyException
+
 
 def generate_key() -> str:
     """
@@ -12,7 +15,17 @@ def encrypt_message(message: str, key: str) -> str:
     """
     Encripta uma mensagem do tipo string, devolvendo o resultado em string.
     """
-    f = Fernet(key.encode())
+    try:
+        f = Fernet(key.encode())
+    except AttributeError:
+        raise EmptySecretKeyException(
+            status=404,
+            error="Not Found",
+            message="Senha de criptografia vazia",
+            error_details=[
+                ErrorDetails(message="A senha para criptografia dos dados não pode ser vazia").to_dict()
+            ],
+        )
     return f.encrypt(message.encode("utf-8")).decode("utf-8")
 
 

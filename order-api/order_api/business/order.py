@@ -130,7 +130,9 @@ def list_orders(
     :param doc_type: Document type do documento inserido, por padrão 'order'.
     :type doc_type: str, optional
     """
+    query = None
     if user_id:
+        get_user_by_id(user_id)
         query = {"user_id": str(user_id)}
     orders, total = Order().list_all(
         query=query,

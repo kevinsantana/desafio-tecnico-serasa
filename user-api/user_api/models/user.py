@@ -92,6 +92,16 @@ USER_CREATE_DEFAULT_RESPONSES = parse_openapi(
                 ).to_dict()
             ],
         ),
+        Message(
+            status=404,
+            error="Not found",
+            message="Senha de criptografia vazia",
+            error_details=[
+                ErrorDetails(
+                    message="A senha de criptografia não pode ser vazia"
+                ).to_dict()
+            ],
+        ),
     ]
 )
 

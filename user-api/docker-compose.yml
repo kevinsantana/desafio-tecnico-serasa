@@ -42,7 +42,7 @@ services:
     container_name: pgadmin_userapi
     image: dpage/pgadmin4
     environment:
-      - PGADMIN_DEFAULT_EMAIL=userapi@tivit.com
+      - PGADMIN_DEFAULT_EMAIL=userapi@email.com
       - PGADMIN_DEFAULT_PASSWORD=userapi
     ports:
       - 8032:80
