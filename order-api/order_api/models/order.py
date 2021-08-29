@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 from order_api.exceptions import ErrorDetails
@@ -173,7 +173,9 @@ LIST_ORDERS_DEFAULT_RESPONSES = parse_openapi(
             error="Service Unavailable",
             message="Serviço indisponível",
             error_details=[
-                ErrorDetails(message="Um ou mais serviços não estão disppníveis").to_dict()
+                ErrorDetails(
+                    message="Um ou mais serviços não estão disponíveis"
+                ).to_dict()
             ],
         ),
     ]

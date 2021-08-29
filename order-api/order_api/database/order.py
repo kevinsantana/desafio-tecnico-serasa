@@ -77,7 +77,7 @@ class Order(Database):
         doc_type: str = "order",
     ):
         """
-        Insert.
+        Insere um documento na base. Seta o atributo __created_at com a data atual.
         """
         if not self.__created_at:
             self.created_at = datetime.utcnow()
@@ -92,7 +92,7 @@ class Order(Database):
         doc_type: str = "order",
     ):
         """
-        Update
+        Atualiza um documento na base. Seta o atributo __updated_at com a data atual.
         """
         if not self.__updated_at:
             self.updated_at = datetime.utcnow()
@@ -105,7 +105,7 @@ class Order(Database):
         doc_type: str = "order",
     ):
         """
-        Find by id
+        Encontra um pedido a partir do seu id.
         """
         return super().list_one(id, index, doc_type)
 
@@ -116,7 +116,7 @@ class Order(Database):
         doc_type: str = "order",
     ):
         """
-        Delete
+        Deleta um pedido a partir do seu id.
         """
         return super().delete(id, index, doc_type)
 
@@ -129,7 +129,7 @@ class Order(Database):
         doc_type: str = "order",
     ):
         """
-        Find all
+        Encontra todos os documentos da base, filtrando ou não o resultado.
         """
         return super().list_all(
             query=query,

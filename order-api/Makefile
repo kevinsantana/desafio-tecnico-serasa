@@ -13,6 +13,10 @@ help:
 	@echo '  make black           		 Install black and run                                                  '
 	@echo '  make doc-sphinx             Build and compile project docs with sphinx                             '
 	@echo '  make run-local           	 Run user-api application local                                         '
+	@echo '  make docker-build           Build docker images with docker-compose                                '
+	@echo '  make docker-start           Run appplication with docker images                                    '
+	@echo '  make docker-stop            Stop all running apps containers                                       '
+	@echo '  make run                    Build and run application                                              '
 	@echo ''
 
 clean:

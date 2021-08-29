@@ -12,6 +12,17 @@ from loguru import logger
 
 
 def _format_orders(hits: list):
+    """
+    Função auxiliar para gerar os dados de saída de pedidos e usuários. Grava no
+    redis caso um dos usuários já tenham sido consultados do microsserviço user-api,
+    recuperando também do redis caso o dado já exista.
+
+    :param list hits: Saída do método `search` da api do elasticsearch.
+    :raises RedisException: Se ao gravar ou recuperar um dado o redis não esteja
+    disponível.
+    :return: Dicionário formatado com os pedidos.
+    :rtype: dict
+    """
     orders = defaultdict(list)
     for hit in hits:
         user_id = hit.get("_source").get("user_id")
@@ -23,7 +34,7 @@ def _format_orders(hits: list):
                 message="Serviço indisponível",
                 error_details=[
                     ErrorDetails(
-                        message=f"Um ou mais serviços não estão disppníveis"
+                        message="Um ou mais serviços não estão disppníveis"
                     ).to_dict()
                 ],
             )
@@ -44,24 +55,42 @@ def _format_orders(hits: list):
     return orders
 
 
-def insert_order(order_data: dict, index: str, doc_type: str, id: int):
+def insert_order(order_data: dict, index: str, doc_type: str, id: str):
     """
-    Insert order
+    Insere um novo pedido, verificando se o usuário informado existe no microsserviço
+    user-api.
+
+    :param dict order_data: Dados do pedido.
+    :param str index: Indice no qual o documento será inserido, por padrão no índice
+    'orders'.
+    :param str doc_type: Document type do documento inserido, por padrão 'order'.
+    :param str id: Id do documento inserido.
     """
     get_user_by_id(order_data.get("user_id"))
     return Order(**order_data).insert(id=id, index=index, doc_type=doc_type).get("_id")
 
 
-def get_order_by_id(index: str, doc_type: str, id: int):
+def get_order_by_id(index: str, doc_type: str, id: str):
     """
-    Get order
+    Recupera um pedido da base a partir do seu id.
+
+    :param str index: Indice no qual o documento será inserido, por padrão no índice
+    'orders'.
+    :param str doc_type: Document type do documento inserido, por padrão 'order'.
+    :param str id: Id do documento consultado.
     """
     return Order().list_one(id, index, doc_type).get("_source")
 
 
-def update_order(order_data: dict, index: str, doc_type: str, id: int):
+def update_order(order_data: dict, index: str, doc_type: str, id: str):
     """
-    Update order
+    Atualiza um pedido.
+
+    :param dict order_data: Dados do pedido a serem atualizados.
+    :param str index: Indice no qual o documento será inserido, por padrão no índice
+    'orders'.
+    :param str doc_type: Document type do documento inserido, por padrão 'order'.
+    :param str id: Id do documento atualizado..
     """
     if order_data.get("user_id"):
         get_user_by_id(order_data.get("user_id"))
@@ -70,20 +99,36 @@ def update_order(order_data: dict, index: str, doc_type: str, id: int):
 
 def delete_order(index: str, doc_type: str, id: int):
     """
-    Delete order
+    Deleta um pedido.
+
+    :param str index: Indice no qual o documento será inserido, por padrão no índice
+    'orders'.
+    :param str doc_type: Document type do documento inserido, por padrão 'order'.
+    :param str id: Id do documento deletado.
     """
     return Order().delete(id, index, doc_type).get("result")
 
 
 def list_orders(
-    user_id: int = None,
+    user_id: str = None,
     quantity: int = 10,
     page: int = 0,
     index: str = "orders",
     doc_type: str = "order",
 ):
     """
-    Find all orders
+    Lista todos os pedidos da base, filtrando ou não por usuário. Formata a saída
+    conforme padrão no arquivo `architecture/er/nosql/order_output.json`.
+
+    :param user_id: Filtro dos pedidos a partir do id do usuário.
+    :type user_id: str, optional.
+    :param int quantity: Quantidade de registros por página.
+    :param int page: Página do retorno.
+    :param index: Indice no qual o documento será inserido, por padrão no índice
+    'orders'.
+    :type index: str, optional
+    :param doc_type: Document type do documento inserido, por padrão 'order'.
+    :type doc_type: str, optional
     """
     if user_id:
         query = {"user_id": str(user_id)}
