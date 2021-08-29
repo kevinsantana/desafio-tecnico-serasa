@@ -166,4 +166,29 @@ DELETE_ORDER_DEFAULT_RESPONSES = parse_openapi(
     ]
 )
 
-LIST_ORDERS_DEFAULT_RESPONSES = parse_openapi([])
+LIST_ORDERS_DEFAULT_RESPONSES = parse_openapi(
+    [
+        Message(
+            status=503,
+            error="Service Unavailable",
+            message="Serviço indisponível",
+            error_details=[
+                ErrorDetails(message="Um ou mais serviços não estão disppníveis").to_dict()
+            ],
+        ),
+    ]
+)
+
+
+LIST_ORDERS_BY_USER_ID_DEFAULT_RESPONSES = parse_openapi(
+    [
+        Message(
+            status=400,
+            error="Bad request",
+            message="Query incorreta",
+            error_details=[
+                ErrorDetails(message="A query de pesquisa está errada").to_dict()
+            ],
+        ),
+    ]
+)

@@ -1,8 +1,6 @@
 from uuid import uuid4
 from datetime import datetime
 
-from loguru import logger
-
 from order_api.database import Database
 
 
@@ -124,6 +122,7 @@ class Order(Database):
 
     def find_all(
         self,
+        query=None,
         quantity: int = 10,
         page: int = 0,
         index: str = "orders",
@@ -133,6 +132,7 @@ class Order(Database):
         Find all
         """
         return super().list_all(
+            query=query,
             quantity=quantity,
             page=page,
             index=index,

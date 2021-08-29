@@ -18,12 +18,12 @@ def _format_orders(hits: list):
         user_info = get_user_by_id(user_id).get("result")
         if not redis.set(user_id, json.dumps(user_info)):
             raise RedisException(
-                status=400,
-                error="Bad Request",
-                message="Um ou mais serviços não estão disppníveis",
+                status=503,
+                error="Service Unavailable",
+                message="Serviço indisponível",
                 error_details=[
                     ErrorDetails(
-                        message=f"Serviço indisponível"
+                        message=f"Um ou mais serviços não estão disppníveis"
                     ).to_dict()
                 ],
             )
@@ -76,12 +76,19 @@ def delete_order(index: str, doc_type: str, id: int):
 
 
 def list_orders(
-    quantity: int = 10, page: int = 0, index: str = "orders", doc_type: str = "order"
+    user_id: int = None,
+    quantity: int = 10,
+    page: int = 0,
+    index: str = "orders",
+    doc_type: str = "order",
 ):
     """
     Find all orders
     """
+    if user_id:
+        query = {"user_id": str(user_id)}
     orders, total = Order().list_all(
+        query=query,
         quantity=quantity,
         page=page,
         index=index,

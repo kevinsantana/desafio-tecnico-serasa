@@ -15,6 +15,7 @@ from order_api.models.order import (
     UpdateOrderResponse,
     UPDATE_ORDER_DEFAULT_RESPONSES,
 )
+from order_api.models.order import LIST_ORDERS_BY_USER_ID_DEFAULT_RESPONSES
 from order_api.models.order import ListOdersResponse, LIST_ORDERS_DEFAULT_RESPONSES
 from order_api.models.order import DeleteOrderResponse, DELETE_ORDER_DEFAULT_RESPONSES
 
@@ -135,5 +136,30 @@ def get_orders(
         page=page,
         index=index,
         doc_type=doc_type,
+    )
+    return pagination(orders, quantity, page, total, str(request.url))
+
+
+@router.get(
+    "/{user_id}",
+    status_code=200,
+    summary="Listar todos os pedidos por id do usuário",
+    response_model=ListOdersResponse,
+    responses=LIST_ORDERS_BY_USER_ID_DEFAULT_RESPONSES,
+)
+def get_orders_by_user_id(
+    request: Request,
+    quantity: int = Query(10, description="Quantidade de registros de retorno", gt=0),
+    page: int = Query(1, description="Página atual de retorno", gt=0),
+    user_id: int = Query(1, description="Id do usuário associado ao pedido")
+):
+    """
+    Listar todos os pedidos filtrando o resultado por id do usuário e paginando
+    o resultado.
+    """
+    orders, total = order.list_orders(
+        user_id=user_id,
+        quantity=quantity,
+        page=page
     )
     return pagination(orders, quantity, page, total, str(request.url))

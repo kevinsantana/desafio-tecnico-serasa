@@ -11,15 +11,40 @@ from order_api.exceptions.order import (
     OrderAlreadyInsertedException,
     OrderNotFoundException,
     UpdateOrderException,
+    QueryMalformedException,
 )
 
 
 class Database:
-    # TODO: try na conexao
+    """
+    Cada tabela do banco de dados é uma classe, em que cada coluna é um atributo
+    da classe e os métodos são suas transações (DML ou DDL). Os dados devolvidos
+    de operações com o banco de dados são dicionários em que cada chave é a coluna
+    da tabela e o valor desta chave é o resultado da operação, para isto, todas
+    as classes que herdam de DataBase precisam implementar o seu método dict.
+    Assim, é possível instanciar um objeto da classe, ou seja, uma tabela do banco
+    de dados mapeando cada atributo da classe a uma coluna desta tabela. E, ainda,
+    aproveitando da OO não é necessário que as demais classes implemetem as transações
+    comuns a todas as tabelas do banco de dados: insert, list_one, list_all etc.
+    """
+
     def __connect(self):
-        self.__es = Elasticsearch([{"host": envs.DB_HOST, "port": envs.DB_PORT}])
+        """
+        Efetua a conexão com o banco de dados, os dados de conexão são capturados
+        de variáveis de ambientes exportadas no arquivo order-api/order_api/config.py.
+        :raises ConnectionError: Se não for possível a conexão com o banco de dados.
+        """
+        try:
+            self.__es = Elasticsearch([{"host": envs.DB_HOST, "port": envs.DB_PORT}])
+        except elasticsearch.exceptions.ConnectionError as error:
+            logger.error(
+                f"Falha na conexão com o banco de dados {envs.DB_HOST} {envs.DB_PORT}: {error}"
+            )
 
     def __disconnect(self):
+        """
+        Fecha a conexão com o banco de dados.
+        """
         self.__es.close()
 
     def create_index_if_not_exists(self, index: str):
@@ -139,17 +164,39 @@ class Database:
 
     def list_all(
         self,
+        query: dict = None,
         quantity: int = 10,
         page: int = 0,
         index: str = "orders",
         doc_type: str = "order",
     ):
+        if query:
+            document = {"query": {"match": query}}
+        else:
+            document = {"query": {"match_all": {}}}
+        logger.debug(query)
+        logger.debug(document)
         offset = (page - 1) * quantity
-        document = {"query": {"match_all": {}}}
         self.__connect()
-        response = self.__es.search(
-            body=document, index=index, doc_type=doc_type, from_=offset, size=quantity
-        )
+        try:
+            response = self.__es.search(
+                body=document,
+                index=index,
+                doc_type=doc_type,
+                from_=offset,
+                size=quantity,
+            )
+        except elasticsearch.exceptions.RequestError:
+            raise QueryMalformedException(
+                status=400,
+                error="Bad request",
+                message="Query incorreta",
+                error_details=[
+                    ErrorDetails(
+                        message=f"A query {query} está mal construída"
+                    ).to_dict()
+                ],
+            )
         total = self.__es.count(body=document, index=index, doc_type=doc_type).get(
             "count"
         )
