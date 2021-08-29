@@ -8,13 +8,14 @@ from user_api.utlis.cryptography import encrypt_message, decrypt_message
 @dataclass()
 class User(UserDB):
     """
-    Following clean architecture principles, this would be a interface adapter.
-    In this scenario, used to interact with database and business logic.
+    Seguindo os princípios da arquitetura limpa, esta classe seria um adapter.
+    Mantendo a lógica negocial separada do banco de dados.
     """
 
     def encrypt(self):
         """
-        Encrypt a message using python cryptography. The message should be a string.
+        Encripta os atibutos sensíveis da classe User, usando python.cryptography.
+        Os atributos devem ser string.
         """
         self.email = encrypt_message(self.email, envs.SECRET_KEY)
         self.cpf = encrypt_message(self.cpf, envs.SECRET_KEY)
@@ -22,7 +23,7 @@ class User(UserDB):
 
     def decrypt(self):
         """
-        Decode a message into a readable string.
+        Decripta os atributos sensíveis do usuário.
         """
         self.email = decrypt_message(self.email, envs.SECRET_KEY)
         self.cpf = decrypt_message(self.cpf, envs.SECRET_KEY)
@@ -31,7 +32,8 @@ class User(UserDB):
 
     def to_object(self):  # pragma: no cover
         """
-        Makes a object out of database object instance.
+        Devolve um objeto do tipo :class:`entities.user.User` a partir de um registro
+        do banco de dados.
         """
         return User(**self.to_dict())
 

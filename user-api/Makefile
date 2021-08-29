@@ -13,6 +13,10 @@ help:
 	@echo '  make black           		 Install black and run                                                  '
 	@echo '  make doc-sphinx             Build and compile project docs with sphinx                             '
 	@echo '  make run-local           	 Run user-api application local                                         '
+	@echo '  make docker-build           Build docker images with docker-compose                                '
+	@echo '  make docker-start           Run appplication with docker images                                    '
+	@echo '  make docker-stop            Stop all running apps containers                                       '
+	@echo '  make run                    Build and run application                                              '
 	@echo ''
 
 clean:
@@ -46,7 +50,7 @@ doc-sphinx:
 	cd docs; make clean; make html
 
 run-local:
-	cd user_api && gunicorn --workers=1 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:7000 'app:start_application()'
+	cd order_api && gunicorn --workers=1 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:8000 'app:start_application()'
 
 docker-build:
 	if [ -f $(BASE_DOCKER_COMPOSE_FILE) ]; then $(DOCKER_COMPOSE) build; fi
