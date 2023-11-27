@@ -18,7 +18,7 @@ from order_api.routes import v1
 from order_api.files import html_desc
 from order_api.routes.v1 import doc_sphinx
 from order_api.exceptions import OrderApiException
-from docs import (
+from order_api.docs import (
     build_html_pages,
     build_html_static,
     build_html_source,
@@ -26,8 +26,8 @@ from docs import (
 
 urllib3.disable_warnings()
 
-logger.level("REQUEST RECEBIDA", no=38, color="<yellow>")
-logger.level("REQUEST FINALIZADA", no=39, color="<yellow>")
+logger.level("REQUEST RECEIVED", no=38, color="<yellow>")
+logger.level("REQUEST FINISHED", no=39, color="<yellow>")
 logger.level("EXCEPTION", no=38, color="<yellow>")
 
 
@@ -70,7 +70,7 @@ def load_exceptions(app: FastAPI):
                 "timestamp": str(datetime.now()),
                 "status": 422,
                 "error": "Unprocessable Entity",
-                "message": "Os parâmetros da requisição estão inválidos",
+                "message": "Invalid request",
                 "method": request.method,
                 "path": request.url.path,
                 "error_details": {
@@ -85,9 +85,9 @@ def load_exceptions(app: FastAPI):
         request: Request, exception: HTTPException
     ):  # pragma: no cover
         message = {
-            401: "Não autorizado",
-            404: "Endereço não encontrado",
-            405: "Método não permitido",
+            401: "Not authorized",
+            404: "Not found",
+            405: "Method not permitted",
         }
         return JSONResponse(
             status_code=exception.status_code,
@@ -112,7 +112,7 @@ def http_middleware(app: FastAPI):
         requets_id = uuid1()
 
         logger.log(
-            "REQUEST RECEBIDA",
+            "REQUEST RECEIVED",
             f"[{request.method}] ID: {requets_id} - IP: {request.client.host}"
             + f" - ENDPOINT: {request.url.path}",
         )
@@ -122,9 +122,9 @@ def http_middleware(app: FastAPI):
         process_time = time.time() - start_time
 
         logger.log(
-            "REQUEST FINALIZADA",
+            "REQUEST FINISHED",
             f"[{request.method}] ID: {requets_id} - IP: {request.client.host}"
-            + f" - ENDPOINT: {request.url.path} - TEMPO: {process_time}",
+            + f" - ENDPOINT: {request.url.path} - TIME: {process_time}",
         )
         response.headers["X-Process-Time"] = str(process_time)
         return response

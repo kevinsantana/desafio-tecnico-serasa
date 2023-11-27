@@ -145,6 +145,5 @@ cython_debug/
 # personal
 .vscode
 *.db
-_build
 
 # End of https://www.toptal.com/developers/gitignore/api/python

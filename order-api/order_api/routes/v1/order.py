@@ -25,20 +25,20 @@ router = APIRouter()
 @router.post(
     "/{index}/{doc_type}/{id}",
     status_code=201,
-    summary="Insere um novo pedido",
+    summary="Enter a new order",
     response_model=InsertOrderResponse,
     responses=INSERT_ORDER_DEFAULT_RESPONSES,
 )
 def create(
-    index: IndexType = Path(..., description="Index do pedido"),
-    doc_type: DocType = Path(..., description="Document type do pedido"),
-    id: int = Path(..., description="Id do pedido"),
+    index: IndexType = Path(..., description="Order index"),
+    doc_type: DocType = Path(..., description="Request document type"),
+    id: int = Path(..., description="Order id"),
     order_data: InsertOrderRequest = Body(
-        ..., description="Dados básicos para cadastro do pedido"
+        ..., description="Basic data for order registration"
     ),
 ):
     """
-    Cria um novo pedido.
+    Create a new order.
     """
     return {
         "id": order.insert_order(
@@ -53,17 +53,17 @@ def create(
 @router.get(
     "/{index}/{doc_type}/{id}",
     status_code=200,
-    summary="Recupera um pedido a partir do seu identificador",
+    summary="Retrieves a request from its identifier",
     response_model=GetOrderResponse,
     responses=GET_ORDER_DEFAULT_RESPONSES,
 )
 def list_one_by_id(
-    index: IndexType = Path(..., description="Index do pedido"),
-    doc_type: DocType = Path(..., description="Document type do pedido"),
-    id: int = Path(..., description="Id do pedido"),
+    index: IndexType = Path(..., description="Order index"),
+    doc_type: DocType = Path(..., description="Request document type"),
+    id: int = Path(..., description="Order id"),
 ):
     """
-    Recupera um pedido a partir do seu id.
+    Retrieves an order from its id.
     """
     return {"result": order.get_order_by_id(index=index, doc_type=doc_type, id=id)}
 
@@ -71,20 +71,18 @@ def list_one_by_id(
 @router.put(
     "/{index}/{doc_type}/{id}",
     status_code=200,
-    summary="Atualizar um pedido",
+    summary="Update an order",
     response_model=UpdateOrderResponse,
     responses=UPDATE_ORDER_DEFAULT_RESPONSES,
 )
 def update(
-    index: IndexType = Path(..., description="Index do pedido"),
-    doc_type: DocType = Path(..., description="Document type do pedido"),
-    id: int = Path(..., description="Id do pedido"),
-    order_data: UpdateOrderRequest = Body(
-        ..., description="Dados para atualização do pedido"
-    ),
+    index: IndexType = Path(..., description="Order index"),
+    doc_type: DocType = Path(..., description="Request document type"),
+    id: int = Path(..., description="Order id"),
+    order_data: UpdateOrderRequest = Body(..., description="Data for order update"),
 ):
     """
-    Atualiza um pedido.
+    Updates an order.
     """
     return {
         "version": order.update_order(
@@ -99,17 +97,17 @@ def update(
 @router.delete(
     "/{index}/{doc_type}/{id}",
     status_code=200,
-    summary="Deletar um pedido",
+    summary="Delete an order",
     response_model=DeleteOrderResponse,
     responses=DELETE_ORDER_DEFAULT_RESPONSES,
 )
 def delete(
-    index: IndexType = Path(..., description="Index do pedido"),
-    doc_type: DocType = Path(..., description="Document type do pedido"),
-    id: int = Path(..., description="Id do pedido"),
+    index: IndexType = Path(..., description="Order index"),
+    doc_type: DocType = Path(..., description="Request document type"),
+    id: int = Path(..., description="Order id"),
 ):
     """
-    Deleta um pedido.
+    Deletes an order.
     """
     return {"result": order.delete_order(index, doc_type, id)}
 
@@ -117,19 +115,19 @@ def delete(
 @router.get(
     "/{index}/{doc_type}/",
     status_code=200,
-    summary="Listar todos os pedidos",
+    summary="List all orders",
     response_model=ListOdersResponse,
     responses=LIST_ORDERS_DEFAULT_RESPONSES,
 )
 def get_orders(
     request: Request,
-    quantity: int = Query(10, description="Quantidade de registros de retorno", gt=0),
-    page: int = Query(1, description="Página atual de retorno", gt=0),
-    index: IndexType = Path(..., description="Index do pedido"),
-    doc_type: DocType = Path(..., description="Document type do pedido"),
+    quantity: int = Query(10, description="Quantity of returned records", gt=0),
+    page: int = Query(1, description="Current return page", gt=0),
+    index: IndexType = Path(..., description="Order index"),
+    doc_type: DocType = Path(..., description="Request document type"),
 ):
     """
-    Listar todos os pedidos, paginando o resultado.
+    List all requests, paginating the result.
     """
     orders, total = order.list_orders(
         quantity=quantity,
@@ -143,19 +141,19 @@ def get_orders(
 @router.get(
     "/{user_id}",
     status_code=200,
-    summary="Listar todos os pedidos por id do usuário",
+    summary="List all orders by user id",
     response_model=ListOdersResponse,
     responses=LIST_ORDERS_BY_USER_ID_DEFAULT_RESPONSES,
 )
 def get_orders_by_user_id(
     request: Request,
-    quantity: int = Query(10, description="Quantidade de registros de retorno", gt=0),
-    page: int = Query(1, description="Página atual de retorno", gt=0),
-    user_id: int = Query(1, description="Id do usuário associado ao pedido"),
+    quantity: int = Query(10, description="Quantity of returned records", gt=0),
+    page: int = Query(1, description="Current return page", gt=0),
+    user_id: int = Query(1, description="User ID associated with the request"),
 ):
     """
-    Listar todos os pedidos filtrando o resultado por id do usuário e paginando
-    o resultado.
+    List all orders by filtering the result by user id and paginating
+    the result.
     """
     orders, total = order.list_orders(user_id=user_id, quantity=quantity, page=page)
     return pagination(orders, quantity, page, total, str(request.url))

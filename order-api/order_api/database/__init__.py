@@ -18,42 +18,42 @@ from order_api.exceptions.database import QueryMalformedException
 
 class Database:
     """
-    Cada tabela do banco de dados é uma classe, em que cada coluna é um atributo
-    da classe e os métodos são suas transações (DML ou DDL). Os dados devolvidos
-    de operações com o banco de dados são dicionários em que cada chave é a coluna
-    da tabela e o valor desta chave é o resultado da operação, para isto, todas
-    as classes que herdam de DataBase precisam implementar o seu método dict.
-    Assim, é possível instanciar um objeto da classe, ou seja, uma tabela do banco
-    de dados mapeando cada atributo da classe a uma coluna desta tabela. E, ainda,
-    aproveitando da OO não é necessário que as demais classes implemetem as transações
-    comuns a todas as tabelas do banco de dados: insert, list_one, list_all etc.
+    Each database table is a class, where each column is an attribute
+    of the class and the methods are its transactions (DML or DDL). The data returned
+    of database operations are dictionaries in which each key is the column
+    of the table and the value of this key is the result of the operation, for this, all
+    Classes that inherit from DataBase need to implement its dict method.
+    Thus, it is possible to instantiate an object of the class, that is, a database table
+    of data mapping each attribute of the class to a column of this table. And still,
+    Taking advantage of OO, it is not necessary for other classes to implement transactions
+    common to all database tables: insert, list_one, list_all, etc.
     """
 
     def __connect(self):
         """
-        Efetua a conexão com o banco de dados, os dados de conexão são capturados
-        de variáveis de ambientes exportadas no arquivo order-api/order_api/config.py.
-        Cria o atributo __es da classe :class:`Elasticsearch` para manipular o elasticsearch.
-        :raises ConnectionError: Se não for possível a conexão com o banco de dados.
+        Connects to the database, the connection data is captured
+        of environment variables exported in the order-api/order_api/config.py file.
+        Creates the __es attribute of the :class:`Elasticsearch` class to manipulate elasticsearch.
+        :raises ConnectionError: If connection to the database is not possible.
         """
         try:
             self.__es = Elasticsearch([{"host": envs.DB_HOST, "port": envs.DB_PORT}])
         except elasticsearch.exceptions.ConnectionError as error:
             logger.error(
-                f"Falha na conexão com o banco de dados {envs.DB_HOST} {envs.DB_PORT}: {error}"
+                f"Failed to connect to database: {envs.DB_HOST} {envs.DB_PORT}: {error}"
             )
 
     def __disconnect(self):
         """
-        Fecha a conexão com o banco de dados.
+        Closes the connection to the database.
         """
         self.__es.close()
 
     def create_index_if_not_exists(self, index: str):
         """
-        Cria um novo índice, caso não exista, ignorando a existência de um mesmo
-        índice com o nome informado.
-        :param str index: Nome do índice que será criado.
+        Creates a new index, if it does not exist, ignoring the existence of the same one
+        index with the given name.
+        :param str index: Name of the index that will be created.
         """
         self.__connect()
         try:
@@ -62,7 +62,7 @@ class Database:
             if ex.error == "resource_already_exists_exception":
                 pass
             else:
-                logger.error(f"Falha na criação do índice {index}: {ex}")
+                logger.error(f"Failed to create index {index}: {ex}")
         self.__disconnect()
 
     def insert(
@@ -73,19 +73,19 @@ class Database:
         doc_type: str = "order",
     ) -> dict:
         """
-        Insere um novo documento no elasticsearch.
+        Inserts a new document into elasticsearch.
 
-        :param dict document: Instância do document type com os dados que serão
-        incluídos, no formato dict.
-        :param id: Id do novo documento, uuid caso não seja informado.
+        :param dict document: Instance of the document type with the data that will be
+            included, in dict format.
+        :param id: Id of the new document, uuid if not provided.
         :type id: str, optional
-        :param index: Indice no qual o documento será inserido, por padrão no índice
-        'orders'.
+        :param index: Index at which the document will be inserted, by default in the index
+            'orders'.
         :type index: str, optional
-        :param doc_type: Document type do documento inserido, por padrão 'order'.
+        :param doc_type: Document type of the inserted document, by default 'order'.
         :type doc_type: str, optional
-        :raises OrderAlreadyInsertedException: Caso o id informado já exista na base.
-        :return: Response da inserção.
+        :raises OrderAlreadyInsertedException: If the id entered already exists in the base.
+        :return: Insertion response.
         :rtype: dict
         """
         self.__connect()
@@ -99,9 +99,9 @@ class Database:
             raise OrderAlreadyInsertedException(
                 status=409,
                 error="Conflict",
-                message="Dado repetido",
+                message="Repeated data",
                 error_details=[
-                    ErrorDetails(message=f"O id {id} do pedido é repetido").to_dict()
+                    ErrorDetails(message=f"Order id {id} is repeated").to_dict()
                 ],
             )
         self.__disconnect()
@@ -114,16 +114,16 @@ class Database:
         doc_type: str = "order",
     ) -> dict:
         """
-        Lista um pedido da base de dados, a partir do seu id.
+        Lists a request from the database, based on its id.
 
-        :param str id: Id do pedido.
-        :param index: Indice no qual o documento será inserido, por padrão no índice
-        'orders'.
+        :param str id: Order id.
+        :param index: Index at which the document will be inserted, by default in the index
+            'orders'.
         :type index: str, optional
-        :param doc_type: Document type do documento inserido, por padrão 'order'.
+        :param doc_type: Document type of the inserted document, by default 'order'.
         :type doc_type: str, optional
-        :raises OrderNotFoundException: O pedido não foi encontrado.
-        :return: Response da busca.
+        :raises OrderNotFoundException: The order was not found.
+        :return: Search response.
         :rtype: dict
         """
         self.__connect()
@@ -133,11 +133,9 @@ class Database:
             raise OrderNotFoundException(
                 status=404,
                 error="Not Found",
-                message="Pedido não encontrado",
+                message="Order not found",
                 error_details=[
-                    ErrorDetails(
-                        message=f"O pedido {id} não foi encontrado na base"
-                    ).to_dict()
+                    ErrorDetails(message=f"Order {id} was not found").to_dict()
                 ],
             )
         self.__disconnect()
@@ -151,19 +149,19 @@ class Database:
         doc_type: str = "order",
     ) -> dict:
         """
-        Atualiza um pedido.
+        Updates an order.
 
-        :param dict doc: Dicionário com os campos e valores a serem atualizados.
-        :param str id: Id do pedido a ser atualizado.
-        :param index: Indice no qual o documento será inserido, por padrão no índice
-        'orders'.
+        :param dict doc: Dictionary with the fields and values to be updated.
+        :param str id: Id of the order to be updated.
+        :param index: Index at which the document will be inserted, by default in the index
+            'orders'.
         :type index: str, optional
-        :param doc_type: Document type do documento inserido, por padrão 'order'.
+        :param doc_type: Document type of the inserted document, by default 'order'.
         :type doc_type: str, optional
-        :raises UpdateOrderException: Quando um campo que não existe no pedido é
-        informado.
-        :raises OrderNotFoundException: O pedido não foi encontrado.
-        :return: Response da atualização.
+        :raises UpdateOrderException: When a field that does not exist in the order is
+            informed.
+        :raises OrderNotFoundException: The order was not found.
+        :return: Update response.
         :rtype: dict
         """
         self.__connect()
@@ -174,18 +172,16 @@ class Database:
             raise UpdateOrderException(
                 status=400,
                 error="Bad Request",
-                message="Campo inválido",
-                error_details=[ErrorDetails(message="O campo não existe").to_dict()],
+                message="Invalid field",
+                error_details=[ErrorDetails(message="Field does not exist").to_dict()],
             )
         except elasticsearch.exceptions.NotFoundError:
             raise OrderNotFoundException(
                 status=404,
                 error="Not Found",
-                message="Pedido não encontrado",
+                message="Order not found",
                 error_details=[
-                    ErrorDetails(
-                        message=f"O pedido {id} não foi encontrado na base"
-                    ).to_dict()
+                    ErrorDetails(message=f"order {id} was not found").to_dict()
                 ],
             )
         self.__disconnect()
@@ -198,16 +194,16 @@ class Database:
         doc_type: str = "order",
     ) -> dict:
         """
-        Deleta um pedido da base de dados.
+        Deletes a request from the database.
 
-        :param str id: Id do pedido a ser atualizado.
-        :param index: Indice no qual o documento será inserido, por padrão no índice
-        'orders'.
+        :param str id: Id of the order to be updated.
+        :param index: Index at which the document will be inserted, by default in the index
+            'orders'.
         :type index: str, optional
-        :param doc_type: Document type do documento inserido, por padrão 'order'.
+        :param doc_type: Document type of the inserted document, by default 'order'.
         :type doc_type: str, optional
-        :raises OrderNotFoundException: O pedido não foi encontrado.
-        :return: Response da atualização.
+        :raises OrderNotFoundException: The order was not found.
+        :return: Update response.
         :rtype: dict
         """
         self.__connect()
@@ -217,11 +213,9 @@ class Database:
             raise OrderNotFoundException(
                 status=404,
                 error="Not Found",
-                message="Pedido não encontrado",
+                message="order not found",
                 error_details=[
-                    ErrorDetails(
-                        message=f"O pedido {id} não foi encontrado na base"
-                    ).to_dict()
+                    ErrorDetails(message=f"order {id} was not found").to_dict()
                 ],
             )
         self.__disconnect()
@@ -236,26 +230,25 @@ class Database:
         doc_type: str = "order",
     ) -> tuple:
         """
-        Lista todos os pedidos da base.
+        List all base requests.
 
         .. note::
-            Este método não funciona quando a base tem mais de 10.000 registros.
-            A paginação é feita usando os parâmetro `from` com `size` da api python
-            do elasticsearch.
+            This method does not work when the database has more than 10,000 records.
+            Pagination is done using the `from` with `size` parameters from the python api
+            from elasticsearch.
             `Stackoverflow <https://stackoverflow.com/a/59142866>`_
 
-        :param query: Parâmetros da busca para filtrar o resultado, no formato aceito
-        pela api do elasticsearch.
+        :param query: Search parameters to filter the result, in the accepted format
+            via the elasticsearch api.
         :type query: dict, optional
-        :param int quantity: Quantidade de registros por página.
-        :param int page: Página do retorno.
-        :param index: Indice no qual o documento será inserido, por padrão no índice
-        'orders'.
+        :param int quantity: Number of records per page.
+        :param int page: Return page.
+        :param index: Index at which the document will be inserted, by default in the index 'orders'.
         :type index: str, optional
-        :param doc_type: Document type do documento inserido, por padrão 'order'.
+        :param doc_type: Document type of the inserted document, by default 'order'.
         :type doc_type: str, optional
-        :raises QueryMalformedException; Se o formato da query for inválido.
-        :return: Documentos da base e total de registros.
+        :raises QueryMalformedException: If the query format is invalid.
+        :return: Base documents and total records.
         :rtype: tuple
         """
         if query:
@@ -278,11 +271,9 @@ class Database:
             raise QueryMalformedException(
                 status=400,
                 error="Bad request",
-                message="Query incorreta",
+                message="Malformed query",
                 error_details=[
-                    ErrorDetails(
-                        message=f"A query {query} está mal construída"
-                    ).to_dict()
+                    ErrorDetails(message=f"Query {query} is malformed").to_dict()
                 ],
             )
         total = self.__es.count(body=document, index=index, doc_type=doc_type).get(

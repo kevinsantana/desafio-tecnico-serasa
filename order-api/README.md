@@ -1,52 +1,51 @@
 # order-api
 
-Order-api é um microsserviço para manter pedidos, onde é possível cadastrar, listar, atualizar, buscar e deletar um pedido.
+Order-api is a microservice for maintaining orders, where it is possible to register, list, update, search and delete an order.
 
-A aplicação foi construída em uma arquitetura de [microsserviço](https://martinfowler.com/articles/microservices.html), em que cada container compõe um parte do todo, são eles:
+The application was built on a [microservice](https://martinfowler.com/articles/microservices.html) architecture, in which each container makes up part of the whole, they are:
 
-* `order_api`: É a API que expõe e permite a manipulação dos pedidos.
-* `db_orders`: É o banco de dados Elasticsearch responsável por manter os pedidos;
-* `redis`: É o cache da aplicação.
+* `order_api`: It is the API that exposes and allows the manipulation of orders.
+* `db_orders`: It is the Elasticsearch database responsible for maintaining orders;
+* `redis`: This is the application cache.
 
-A API foi construída com [FastApi](https://fastapi.tiangolo.com/), que possuí uma excelente validação de tipos, tanto de entrada como de saída da API, usando [Pydantic](https://pydantic-docs.helpmanual.io/). Além disso `FastApi` documenta automaticamente a API utlizando [OpenAPI](https://github.com/OAI/OpenAPI-Specification).
+The API was built with [FastApi](https://fastapi.tiangolo.com/), which has excellent type validation, both input and output from the API, using [Pydantic](https://pydantic-docs .helpmanual.io/). Furthermore `FastApi` automatically documents the API using [OpenAPI](https://github.com/OAI/OpenAPI-Specification).
 
-O projeto foi documentado utilizando [Sphinx](https://www.sphinx-doc.org/en/master/), a documentação pode ser acessada em [Docs](http://localhost:8000/)
+The project was documented using [Sphinx](https://www.sphinx-doc.org/en/master/), the documentation can be accessed at [Docs](http://localhost:3090/)
 
-## Pré-requisitos
+## Prerequisites
 
-É preciso configurar o [docker](https://docs.docker.com/) e o [docker-compose](https://docs.docker.com/compose/) para consumir o projeto.
+You need to configure [docker](https://docs.docker.com/) and [docker-compose](https://docs.docker.com/compose/) to consume the project.
 
-As variáveis de ambiente utilizadas pelos containers estão configuradas no arquivo [docker-compose.yml](docker-compose.yml), e são exatamente as mesmas configuradas no arquivo [config.py](order-api/order_api/config.py) contendo as variáveis de conexão com o banco de dados e com o `redis`.
+The environment variables used by containers are configured in the [docker-compose.yml](docker-compose.yml) file, and are exactly the same as those configured in the [config.py](order-api/order_api/config.py) file. containing the connection variables with the database and `redis`.
 
-### Instalação e Execução
+### Installation and Execution
 
-Clone o repositório do projeto, e na pasta `order-api`, siga as instruções abaixo.
+Clone the project repository, and in the `order-api` folder, follow the instructions below.
 
-O projeto conta com um [Makefile](https://en.wikipedia.org/wiki/Make_(software)#Makefile) para automatizar a execução do projeto. Para executar o projeto utilize o seguinte comando:
+The project has a [Makefile](https://en.wikipedia.org/wiki/Make_(software)#Makefile) to automate project execution. To run the project use the following command:
 
 ```bash
 make run
 ```
 
-Através deste comando é possível _buildar_ as imagens e executar o projeto.
+Using this command it is possible to _build_ the images and run the project.
 
-Com a aplicação no ar, basta acessar o [ReDoc](http://localhost:8000/v1/docs) para saber como utilizar cada um dos *endpoints* e para utilizar os *endpoints* acesse o [Swagger](http://localhost:8000/v1/swagger).
+With the application live, simply access [ReDoc](http://localhost:3090/v1/docs) to learn how to use each of the *endpoints* and to use the *endpoints* access [Swagger](http: //localhost:3090/v1/swagger).
+## Running tests
 
-## Executando testes
+Application tests validate the application's business logic, checking whether the functions and modules behave as expected.
 
-Os testes da aplicação realizam a validação da lógica negocial da aplicação, verificando se as funções e módulos se comportam conforme esperado.
+Ideally, the tests should be executed in a _dockerized_ way, to do so, the API and database _containers_ must be running, which can be done by following the instructions in [Installation and Execution]().
 
-O ideal é que os testes sejam executados de forma _dockerizada_, para tanto,  é preciso que os _containers_ da API e do banco de dados estejam em execução, o que pode ser feito seguindo as instruções em [Instalação e Execução]().
-
-Com o container da API nomeado como `order-api`, execute:
+With the API container named `order-api`, run:
 
 ```bash
 docker container exec -it order-api pytest -v
 ```
 
-### Estilo de código
+### Code style
 
-Esse código segue o padrão PEP8 e pode ser testado com a biblioteca [PyLama](https://github.com/klen/pylama) como no exemplo a seguir
+This code follows the PEP8 standard and can be tested with the [PyLama](https://github.com/klen/pylama) library as in the following example
 
 ```bash
 make lint
@@ -54,17 +53,17 @@ make lint
 
 ### Autoformatter
 
-O projeto conta com o [Black](https://github.com/psf/black) que é um `autoformatter`, formatando o código caso exista algum trecho de código que não siga a PEP8. Para executá-lo basta rodar o seguinte comando no terminal:
+The project has [Black](https://github.com/psf/black) which is an `autoformatter`, formatting the code if there is any piece of code that does not follow PEP8. To run it, just run the following command in the terminal:
 
 ```bash
-make black
+makeup black
 ```
 
 ## Deploy
 
-Com a aplicação _dockerizada_ e testada, é possível efetuar o _deploy_ em um orquestrador de _containers_ a exemplo do [Kubernetes](https://kubernetes.io/pt/), ou mesmo, com o orquestrador nativo do Docker [Swarm](https://docs.docker.com/engine/swarm/).
+With the application _dockerized_ and tested, it is possible to _deploy_ in a _container orchestrator_ such as [Kubernetes](https://kubernetes.io/pt/), or even with the native Docker orchestrator [Swarm](https ://docs.docker.com/engine/swarm/).
 
-## Construído Com
+## Built With
 
 * [black](https://github.com/psf/black)
 * [loguru](https://github.com/Delgan/loguru)
@@ -76,14 +75,14 @@ Com a aplicação _dockerizada_ e testada, é possível efetuar o _deploy_ em um
 * [requests](https://requests.readthedocs.io/en/master/)
 * [sphinx](https://www.sphinx-doc.org/en/master/)
 
-## Versionamento
+## Versioning
 
-O versionamento segue o padrão do [Versionamento Semântico](http://semver.org/).
+Versioning follows the [Semantic Versioning](http://semver.org/) standard.
 
 ## License
 
-Todos os direitos são reservados ao autor Kevin de Santana Araujo.
+All rights are reserved to the author Kevin de Santana Araujo.
 
-## Outras informações
+## Other information
 
-* Caso tenha alguma dúvida em relação ao projeto, ou queira contribuir com sugestões ou críticas, abra uma [issue]() ou procure o desenvolvedor através do email kevin_santana.araujo@hotmail.com
+* If you have any questions regarding the project, or want to contribute with suggestions or criticisms, open an [issue]() or contact the developer via email at kevin_santana.araujo@hotmail.com

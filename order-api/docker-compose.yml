@@ -11,11 +11,11 @@ services:
       - .:/deploy
     working_dir: /deploy
     command: >
-        bash -cx "cd docs; make clean; make html; cd .. &&
+        bash -cx "cd order_api/docs; make clean; make html; cd .. &&
         cd order_api &&
-        gunicorn --workers=3 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:8000 'app:start_application()'"
+        gunicorn --workers=3 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:3090 'app:start_application()'"
     ports:
-      - 8000:8000
+      - 3090:3090
     networks:
       - order-network
       - user-network

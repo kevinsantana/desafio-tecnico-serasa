@@ -21,4 +21,4 @@ WORKDIR /deploy
 
 RUN pip install -e . 
 
-EXPOSE 8000
+EXPOSE 3090

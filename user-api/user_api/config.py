@@ -31,7 +31,7 @@ class DatabaseModel(BaseModel):
 
 
 class Envs(BaseSettings):
-    ENVIRONMENT: Optional[Enum] = EnvironmentEnum.PROD
+    ENVIRONMENT: Optional[Enum] = EnvironmentEnum.LOCAL
     RESET_DB: Optional[bool] = False
     SQLALCHEMY_ECHO: bool = True
     SQLALCHEMY_TEST: str = "sqlite:///./sql_app.db"

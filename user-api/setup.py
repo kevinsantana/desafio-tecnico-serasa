@@ -22,7 +22,7 @@ run_requirements = [
     "sphinx-autobuild==0.7.1",
     "SQLAlchemy==1.4.20",
     "cryptography==3.4.8",
-    "psycopg2==2.9.1",
+    "psycopg2-binary==2.9.5",
 ]
 
 here = path.abspath(path.dirname(__file__))

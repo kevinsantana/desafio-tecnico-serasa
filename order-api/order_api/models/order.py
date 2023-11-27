@@ -16,11 +16,11 @@ class DocType(str, Enum):
 
 
 class InsertOrderRequest(BaseModel):
-    user_id: int = Field(1, description="Id do usuário associado ao pedido")
-    item_description: str = Field("Um item incrivel", description="Descrição do item")
-    item_quantity: int = Field(3, description="Quantidade de itens")
-    item_price: float = Field(2.50, description="Valor do item")
-    total_value: float = Field(7.50, description="Valor total do pedido")
+    user_id: int = Field(1, description="User id")
+    item_description: str = Field("An awesome item", description="Item description")
+    item_quantity: int = Field(3, description="Size of the items")
+    item_price: float = Field(2.50, description="Item value")
+    total_value: float = Field(7.50, description="Order total amount")
 
 
 class InsertOrderResponse(BaseModel):
@@ -28,13 +28,13 @@ class InsertOrderResponse(BaseModel):
 
 
 class GetOrder(BaseModel):
-    user_id: int = Field(..., description="Id do usuário associado ao pedido")
-    item_description: str = Field(..., description="Descrição do item")
+    user_id: int = Field(..., description="User id")
+    item_description: str = Field(..., description="Item description")
     item_quantity: int = Field(..., description="Quantidade de itens")
-    item_price: float = Field(..., description="Valor do item")
-    total_value: float = Field(7.50, description="Valor total do pedido")
-    created_at: str = Field(..., description="Data de criação do pedido")
-    updated_at: Optional[str] = Field(None, description="Data de alteração do pedido")
+    item_price: float = Field(..., description="Item value")
+    total_value: float = Field(7.50, description="Order total amount")
+    created_at: str = Field(..., description="Creation date of the order")
+    updated_at: Optional[str] = Field(None, description="Order updated date")
 
 
 class GetOrderResponse(BaseModel):
@@ -42,13 +42,11 @@ class GetOrderResponse(BaseModel):
 
 
 class UpdateOrderRequest(BaseModel):
-    user_id: Optional[int] = Field(
-        None, description="Id do usuário associado ao pedido"
-    )
-    item_description: Optional[str] = Field(None, description="Descrição do item")
+    user_id: Optional[int] = Field(None, description="User id")
+    item_description: Optional[str] = Field(None, description="Item description")
     item_quantity: Optional[int] = Field(None, description="Quantidade de itens")
-    item_price: Optional[float] = Field(None, description="Valor do item")
-    total_value: Optional[float] = Field(None, description="Valor total do pedido")
+    item_price: Optional[float] = Field(None, description="Item value")
+    total_value: Optional[float] = Field(None, description="Order total amount")
 
 
 class UpdateOrderResponse(BaseModel):
@@ -61,22 +59,22 @@ class DeleteOrderResponse(BaseModel):
 
 class Order(BaseModel):
     id: str = Field(..., description="Id do pedido")
-    item_description: str = Field(..., description="Descrição do item")
+    item_description: str = Field(..., description="Item description")
     item_quantity: int = Field(..., description="Quantidade de itens")
-    item_price: float = Field(..., description="Valor do item")
-    total_value: float = Field(7.50, description="Valor total do pedido")
-    created_at: str = Field(..., description="Data de criação do pedido")
-    updated_at: Optional[str] = Field(None, description="Data de alteração do pedido")
+    item_price: float = Field(..., description="Item value")
+    total_value: float = Field(7.50, description="Order total amount")
+    created_at: str = Field(..., description="Creation date of the order")
+    updated_at: Optional[str] = Field(None, description="Order updated date")
 
 
 class User(BaseModel):
-    id_user: int = Field(..., description="Id do usuário associado ao pedido")
-    name: str = Field(..., description="Nome completo")
+    id_user: int = Field(..., description="User id")
+    name: str = Field(..., description="Full name")
     cpf: str = Field(..., description="Cadastro de pessoa física(CPF)")
     email: Optional[str] = Field(..., description="E-mail")
-    phone_number: str = Field(..., description="Número do telefone")
-    created_at: str = Field(..., description="Data de criação do usuário")
-    updated_at: Optional[str] = Field(None, description="Data de alteração do usuário")
+    phone_number: str = Field(..., description="Phone number")
+    created_at: str = Field(..., description="User creation date")
+    updated_at: Optional[str] = Field(None, description="User updated date")
 
 
 class ListOrders(BaseModel):
@@ -86,7 +84,7 @@ class ListOrders(BaseModel):
 
 class ListOdersResponse(BaseModel):
     result: ListOrders
-    pagination: Pagination = Field(..., description="Dados de paginação")
+    pagination: Pagination = Field(..., description="Pagination data")
 
 
 INSERT_ORDER_DEFAULT_RESPONSES = parse_openapi(
@@ -94,16 +92,14 @@ INSERT_ORDER_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=409,
             error="Conflict",
-            message="Dado repetido",
-            error_details=[ErrorDetails(message="O id do pedido é repetido").to_dict()],
+            message="Repeated data",
+            error_details=[ErrorDetails(message="Order id is repeated").to_dict()],
         ),
         Message(
             status=404,
             error="Not found",
-            message="Usuário não encontrado",
-            error_details=[
-                ErrorDetails(message="O usuário informado não existe na base").to_dict()
-            ],
+            message="User not found",
+            error_details=[ErrorDetails(message="User does not exist").to_dict()],
         ),
     ]
 )
@@ -113,10 +109,8 @@ GET_ORDER_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=404,
             error="Not found",
-            message="Pedido não encontrado",
-            error_details=[
-                ErrorDetails(message="O pedido informado não existe na base").to_dict()
-            ],
+            message="Order not found",
+            error_details=[ErrorDetails(message="The order does not exist").to_dict()],
         ),
     ]
 )
@@ -126,27 +120,21 @@ UPDATE_ORDER_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=404,
             error="Not found",
-            message="Pedido não encontrado",
-            error_details=[
-                ErrorDetails(message="O pedido informado não existe na base").to_dict()
-            ],
+            message="Order not found",
+            error_details=[ErrorDetails(message="The order does not exist").to_dict()],
         ),
         Message(
             status=404,
             error="Not found",
-            message="Usuário não encontrado",
-            error_details=[
-                ErrorDetails(message="O usuário informado não existe na base").to_dict()
-            ],
+            message="User not found",
+            error_details=[ErrorDetails(message="User does not exist").to_dict()],
         ),
         Message(
             status=400,
             error="Bad Request",
-            message="Campo de atualização inválido",
+            message="Invalid field",
             error_details=[
-                ErrorDetails(
-                    message="O campo informado para atualização não existe"
-                ).to_dict()
+                ErrorDetails(message="The required field does not exist").to_dict()
             ],
         ),
     ]
@@ -158,10 +146,8 @@ DELETE_ORDER_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=404,
             error="Not found",
-            message="Pedido não encontrado",
-            error_details=[
-                ErrorDetails(message="O pedido informado não existe na base").to_dict()
-            ],
+            message="Order not found",
+            error_details=[ErrorDetails(message="The order does not exist").to_dict()],
         ),
     ]
 )
@@ -174,7 +160,7 @@ LIST_ORDERS_DEFAULT_RESPONSES = parse_openapi(
             message="Serviço indisponível",
             error_details=[
                 ErrorDetails(
-                    message="Um ou mais serviços não estão disponíveis"
+                    message="One or more services are unavailable at the moment"
                 ).to_dict()
             ],
         ),
@@ -187,10 +173,8 @@ LIST_ORDERS_BY_USER_ID_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=400,
             error="Bad request",
-            message="Query incorreta",
-            error_details=[
-                ErrorDetails(message="A query de pesquisa está errada").to_dict()
-            ],
+            message="Malformed query",
+            error_details=[ErrorDetails(message="Malformed query").to_dict()],
         ),
     ]
 )

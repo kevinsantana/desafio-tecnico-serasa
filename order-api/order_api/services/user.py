@@ -14,10 +14,8 @@ def get_user_by_id(id_user: int):
         raise UserNotFoundException(
             status=404,
             error="Not Found",
-            message="Usuário não encontrado",
+            message="User not found",
             error_details=[
-                ErrorDetails(
-                    message=f"O usuário {id_user} não foi encontrado na base"
-                ).to_dict()
+                ErrorDetails(message=f"User {id_user} was not found").to_dict()
             ],
         )

@@ -10,7 +10,7 @@ from user_api.models import Message, parse_openapi, Pagination
 class UserCreateRequest(BaseModel):
     name: str = Field(
         "João Augusto Albuquerque",
-        description="Nome completo",
+        description="Full name",
         min_length=10,
         max_length=100,
     )
@@ -40,7 +40,7 @@ class UserCreateResponse(BaseModel):
 class UserUpdateRequest(BaseModel):
     name: Optional[str] = Field(
         "João Augusto Albuquerque",
-        description="Nome completo",
+        description="Full name",
         min_length=10,
         max_length=100,
     )
@@ -52,11 +52,11 @@ class UserUpdateRequest(BaseModel):
         regex=r"\d",
     )
     email: Optional[str] = Field(
-        "seuemail@mail.com", description="E-mail", min_length=6, max_length=55
+        "youremail@mail.com", description="E-mail", min_length=6, max_length=55
     )
     phone_number: Optional[str] = Field(
         "99999-9999",
-        description="Número do telefone",
+        description="Phone number",
         min_length=9,
         max_length=10,
         regex=r"\d",
@@ -77,7 +77,7 @@ class GetUserResponse(BaseModel):
 
 class ListUsersResponse(BaseModel):
     result: List[UserCreateRequest]
-    pagination: Pagination = Field(..., description="Dados de paginação")
+    pagination: Pagination = Field(..., description="Pagination data")
 
 
 USER_CREATE_DEFAULT_RESPONSES = parse_openapi(
@@ -85,20 +85,20 @@ USER_CREATE_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=409,
             error="Conflict",
-            message="Dado repetido",
+            message="Repeated data",
             error_details=[
                 ErrorDetails(
-                    message="Os dados informados para o usuário já existem na base"
+                    message="The data already is presented on the database"
                 ).to_dict()
             ],
         ),
         Message(
             status=404,
             error="Not found",
-            message="Senha de criptografia vazia",
+            message="Empty encryption password",
             error_details=[
                 ErrorDetails(
-                    message="A senha de criptografia não pode ser vazia"
+                    message="The encryption password cannot be empty"
                 ).to_dict()
             ],
         ),
@@ -110,10 +110,8 @@ USER_UPDATE_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=404,
             error="Not Found",
-            message="Usuário não encontrado",
-            error_details=[
-                ErrorDetails(message="Erro ao atualizar o usuário").to_dict()
-            ],
+            message="User not found",
+            error_details=[ErrorDetails(message="Error to update user").to_dict()],
         ),
     ]
 )
@@ -123,8 +121,8 @@ USER_DELETE_DEFAULT_RESPONSES = parse_openapi(
         Message(
             status=404,
             error="Not Found",
-            message="Usuário não encontrado",
-            error_details=[ErrorDetails(message="Erro ao deletar o usuário").to_dict()],
+            message="User not found",
+            error_details=[ErrorDetails(message="Error to delete user").to_dict()],
         ),
     ]
 )

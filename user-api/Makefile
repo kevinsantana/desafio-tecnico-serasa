@@ -47,10 +47,10 @@ test: clean black lint
 	python -m pytest --cov  --cov-report=xml:coverage.xml --junitxml=junit.xml
 
 doc-sphinx:
-	cd docs; make clean; make html
+	cd user_api/docs; make clean; make html
 
 run-local:
-	cd order_api && gunicorn --workers=1 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:8000 'app:start_application()'
+	cd user_api && gunicorn --workers=1 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:4090 'app:start_application()'
 
 docker-build:
 	if [ -f $(BASE_DOCKER_COMPOSE_FILE) ]; then $(DOCKER_COMPOSE) build; fi

@@ -22,17 +22,17 @@ router = APIRouter()
 @router.post(
     "/",
     status_code=201,
-    summary="Insere um usuário",
+    summary="Creates an user",
     response_model=UserCreateResponse,
     responses=USER_CREATE_DEFAULT_RESPONSES,
 )
 def create(
     user_data: UserCreateRequest = Body(
-        ..., description="Dados básicos para cadastro do usuárip"
+        ..., description="Basic data for user registration"
     )
 ):
     """
-    Endpoint para efetuar a gravação de um usuário no banco de dados.
+    Endpoint to save a user to the database.
     """
     return {"id_user": usr.insert_user(usr_entity(**user_data.dict()))}
 
@@ -40,16 +40,16 @@ def create(
 @router.put(
     "/{id_user}",
     status_code=200,
-    summary="Atualizar um usuário",
+    summary="Update an user",
     response_model=UserUpdateResponse,
     responses=USER_UPDATE_DEFAULT_RESPONSES,
 )
 def update(
-    id_user: int = Query(..., description="Id do usuário a ser atualizado"),
-    user_data: UserUpdateRequest = Body(..., description="Dados da atualização"),
+    id_user: int = Query(..., description="User id to be updated"),
+    user_data: UserUpdateRequest = Body(..., description="Data to be updated"),
 ):
     """
-    Atualiza um usuário.
+    Updates an user.
     """
     return {"result": usr.update_user(id_user=id_user, update_data=user_data.dict())}
 
@@ -57,15 +57,15 @@ def update(
 @router.delete(
     "/{id_user}",
     status_code=200,
-    summary="Deleta um usuário",
+    summary="Deletes an user",
     response_model=UserDeleteResponse,
     responses=USER_DELETE_DEFAULT_RESPONSES,
 )
 def delete(
-    id_user: int = Query(..., description="Id do usuário a ser deletado"),
+    id_user: int = Query(..., description="User id to be deleted"),
 ):
     """
-    Deleta um usuário
+    Deletes an user
     """
     return {"result": usr.delete_user(id_user)}
 
@@ -73,15 +73,15 @@ def delete(
 @router.get(
     "/{id_user}",
     status_code=200,
-    summary="Listar as informações de um usuário",
+    summary="Get an user",
     response_model="",
     responses="",
 )
 def list_one(
-    id_user: int = Query(..., description="Id do usuário"),
+    id_user: int = Query(..., description="User id"),
 ):
     """
-    Lista um usuário
+    Get an user
     """
     return {"result": usr.list_one(id_user)}
 
@@ -90,16 +90,16 @@ def list_one(
     "/",
     response_model=ListUsersResponse,
     status_code=200,
-    summary="Listar as informações de todos os usuários",
+    summary="List users",
     responses=USER_LIST_DEFAULT_RESPONSES,
 )
 def list_all(
     request: Request,
-    quantity: int = Query(10, description="Quantidade de registros de retorno", gt=0),
-    page: int = Query(1, description="Página atual de retorno", gt=0),
+    quantity: int = Query(10, description="Number of return records", gt=0),
+    page: int = Query(1, description="Current return page", gt=0),
 ):
     """
-    Lista as todos os usuários, paginando o resultado.
+    List all users, paginating the result.
     """
     users, total = usr.list_all(quantity, page)
     return pagination(users, quantity, page, total, str(request.url))

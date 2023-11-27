@@ -35,9 +35,9 @@ class MyDict(UserDict):
 
 class DatabaseService:
     """
-    Um api para interação com sqlalchemy. Ao criar o objeto, associa esta instância
-    a uma sessão do sqlalchemy. Quando o objeto é deletado pelo `garbage collector`
-    a sessão é encerrada, coletando uma exceção caso aconteça.
+    An api for interacting with sqlalchemy. When creating the object, it associates this instance
+    to a sqlalchemy session. When the object is deleted by the `garbage collector`
+    the session is terminated, collecting an exception if this happens.
     """
 
     def __init__(self):
@@ -71,10 +71,10 @@ class DatabaseService:
 
 class DataBaseCrud:
     """
-    Operaçãoes básicas de banco de dados (CRUD). Os métodos são da classe, pois,
-    a interação com a sessão do sqlalchemy é feita a partir de uma classe que representa
-    uma tabela no banco de dados, assim, abstraindo para o desenvolvedor uma camada
-    de complexidade.
+    Basic database operations (CRUD). The methods are of the class, because interaction
+    with the sqlalchemy session is done from a class that represents a table in
+    the database. a table in the database, thus abstracting a layer of complexity
+    for the developer.
     """
 
     @classmethod
@@ -85,14 +85,14 @@ class DataBaseCrud:
         order_by: tuple = None,
     ):
         """
-        Encontra e retorna o primeiro registro no banco de dados a partir do filtro
-        informado.
+        Finds and returns the first record in the database from the filter
+        entered.
 
-        :param connection: Conexão com o banco de dados, do tipo :class:`database.database_service.DatabaseServicer`.
+        :param connection: Connection to the database, of type :class:`database.database_service.DatabaseServicer`.
         :param tuple filter: Filter to apply on query.
-        :param tuple order_by: Se o resultado deve ser aplicado um order_by do tipo
-        (coluna, ordenacao).
-        :return: Registro encontrado.
+        :param tuple order_by: Whether to apply an order_by of type
+            (column, sort).
+        :return: Record found.
         :rtype: sqlalchemy.query
         """
         query = connection.query(cls)
@@ -118,16 +118,16 @@ class DataBaseCrud:
         is_active: str_or_bool = True,
     ) -> Generator:
         """
-        Retorna todos os registros do banco de dados a partir do filtro informado.
-        Paginando o resultado e retornando um generator.
+        Returns all the records in the database from the filter entered.
+        Paging the result and returning a generator.
 
-        :param connection: Conexão com o banco de dados, do tipo :class:`database.database_service.DatabaseServicer`.
-        :param int page: Offset da query.
-        :param int quantity: Quantidade de registros por página
-        :param is_active: Se apenas registros ativos e de tabelas que possuam uma
-        coluna 'is_active'.
-        :type is_active, bool, optional
-        :return: Resultado da consulta.
+        :param connection: Connection to the database, of type :class:`database.database_service.DatabaseServicer`.
+        :param int page: Offset of the query.
+        :param int quantity: Number of records per page
+        :param is_active: If only active records and records from tables that have an
+            is_active' column.
+        :type is_active: bool, optional
+        :return: Result of the query.
         :rtype: generator
         """
         query = connection.query(cls)
@@ -149,19 +149,18 @@ class DataBaseCrud:
         order_by: tuple = None,
     ) -> Generator:
         """
-        Procura todos os registros a partir do filtro informado. Paginando o resultado
-        e devolvendo um generator.
+        Searches for all records from the filter entered. Paginating the result
+        and returning a generator.
 
-        :param connection: Conexão com o banco de dados, do tipo :class:`database.database_service.DatabaseServicer`.
-        :param tuple filter: Filtro a ser aplicado na consulta, do tipo (Tabela.coluna == coluna).
-        :param int after: Quantidade de resultados que devem ser pulados na consulta.
-        :param int limit: Limite de resultados por página
-        :param is_active: Se apenas registros ativos e de tabelas que possuam uma
-        coluna 'is_active'.
+        :param connection: Connection to the database, of type :class:`database.database_service.DatabaseServicer`.
+        :param tuple filter: Filter to be applied to the query, of type (Table.column == column).
+        :param int after: Number of results that should be skipped in the query.
+        :param int limit: Limit of results per page
+        :param is_active: If only active records and records from tables that have an
+            is_active' column.
         :type is_active: bool, optional
-        :param tuple order_by: Se o resultado deve ser aplicado um order_by do tipo
-        (coluna, ordenacao).
-        :return: Resultado da consulta.
+        :param tuple order_by: Whether an order_by of type (column, sort).
+        :return: Result of the query.
         :rtype: generator
         """
         query = connection.query(cls)
@@ -191,14 +190,14 @@ class DataBaseCrud:
     @classmethod
     def update(cls, connection: DatabaseService, filter: tuple, data: dict) -> list:
         """
-        Atualiza um registro do banco de dados.
+        Updates a database record.
 
-        :param connection: Conexão com o banco de dados, do tipo :class:`database.database_service.DatabaseServicer`.
-        :param tuple filter: Filtro a ser aplicado na consulta, do tipo (Tabela.coluna == coluna)
-        :param dict data: Coluna e valores a serem atualizados do tipo coluna: valor.
-        :raises UpdateTableException: Se alguma coluna informada no parâmetro data
-        não existirem na tabela.
-        :return: Lista com todos os registros atualizados a partir do filtro informado.
+        :param connection: Connection to the database, of type :class:`database.database_service.DatabaseServicer`.
+        :param tuple filter: Filter to be applied to the query, of type (Table.column == column)
+        :param dict data: Column and values to be updated of type column: value.
+        :raises UpdateTableException: If any of the columns in the data parameter
+            parameter does not exist in the table.
+        :return: List of all records updated from the filter entered.
         :rtype: list
         """
         updated_list = list()
@@ -215,10 +214,10 @@ class DataBaseCrud:
                     raise UpdateTableException(
                         status=404,
                         error="Not Found",
-                        message="Campo não encontrado",
+                        message="Field not found",
                         error_details=[
                             ErrorDetails(
-                                message=f"O campo {column} não existe"
+                                message=f"The field {column} does not exist"
                             ).to_dict()
                         ],
                     )
@@ -230,9 +229,9 @@ class DataBaseCrud:
 
     def insert(self, connection: DatabaseService):
         """
-        Insere um registro no banco de dados.
+        Adds a record to the database.
 
-        :param connection: Conexão com o banco de dados, do tipo :class:`database.database_service.DatabaseServicer`.
+        :param connection: Connection to the database, of type :class:`database.database_service.DatabaseServicer`.
         :return: Self
         """
         connection.add(self)
@@ -241,9 +240,9 @@ class DataBaseCrud:
 
     def delete(self, connection: DatabaseService):
         """
-        Deleta um registro no banco de dados.
+        Deletes a record in the database.
 
-        :param connection: Conexão com o banco de dados, do tipo :class:`database.database_service.DatabaseServicer`.
+        :param connection: Connection to the database, of type :class:`database.database_service.DatabaseServicer`.
         """
         connection.remove(self)
         connection.commit()
@@ -252,15 +251,15 @@ class DataBaseCrud:
         self, no_fk: bool = True, no_none: bool = True, no_id: bool = True
     ) -> dict:
         """
-        Método auxiliar para formatar uma tabela adventa do banco de dados.
+        Helper method for formatting an advent table from the database.
 
-        :param no_fk: Se no dicionário construídos colunas do tipo foreign key
-        devem ser adicionadas a formatação final.
+        :param no_fk: If the dictionary contains foreign key columns
+            should be added to the final formatting.
         :type no_fK: bool, optional
-        :param no_none: Se colunas nulas devem ser adicionadas a formatação final.
+        :param no_none: Whether null columns should be added to the final formatting.
         :type no_none: bool, optional
-        :param no_id: Se colunas do tipo primary key devem ou não ser adicionadas
-        a formatação final.
+        :param no_id: Whether or not columns of type primary key should be added to
+            to the final formatting.
         :type no_id: bool, optional
         """
         class_attr_dict = dict()
@@ -281,15 +280,15 @@ class DataBaseCrud:
 
     def to_dict(self, no_fk: bool = True, no_none: bool = True, no_id: bool = True):
         """
-        Retorna um dicionário a partir de uma instância da classe :class:`database.database_service.DatabaseCrud`
+        Returns a dictionary from an instance of the class :class:`database.database_service.DatabaseCrud`
 
-        :param bool no_fk: Se dados do tipo foreign key devem ou não ser adicionados
-        ao dicionário.
+        :param bool no_fk: Whether or not data of type foreign key should be added
+            to the dictionary.
         :type no_fk: bool, optional
-        :param bool no_none: Se colunas nulas devem ou não ser adicionados ao dicionário.
+        :param bool no_none: Whether or not null columns should be added to the dictionary.
         :type no_none: bool, optional
-        :param bool no_id: Se dados do tipo primary key devem ou não ser adicionados
-        ao dicionário.
+        :param bool no_id: Whether or not primary key data should be added to the dictionary.
+            to the dictionary.
         :type no_id: bool, optional
         """
         return self.__parse_table(no_fk, no_none, no_id)

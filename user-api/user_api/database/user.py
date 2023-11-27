@@ -6,7 +6,6 @@ from user_api.database.database_service import Base, DataBaseCrud
 
 
 class User(Base, DataBaseCrud):
-
     __tablename__ = "USER"
 
     id_user = Column(

@@ -1,54 +1,54 @@
-# order-api
+# user-api
 
-User Api é um microsserviço para manter usuários, onde é possível cadastrar, listar, atualizar, buscar e deletar um usuário.
+User Api is a microservice for maintaining users, where you can register, list, update, search for and delete a user.
 
-A aplicação foi construída em uma arquitetura de [microsserviço](https://martinfowler.com/articles/microservices.html), em que cada container compõe um parte do todo, são eles:
+The application was built in a [microservice](https://martinfowler.com/articles/microservices.html) architecture, in which each container makes up a part of the whole:
 
-* `user_api`: É a API que expõe e permite manter usuários.
-* `db_user`: É o banco de dados PostgreSQL responsável por manter os usuários;
-* `pgadmin_userapi`: É uma gui para realizar consultar e manipular o banco de dados.
+* `user_api`: API that exposes and allows users to be maintained.
+* `db_user`: PostgreSQL database responsible for maintaining users;
+* `pgadmin_userapi`: Gui for querying and manipulating the database.
 
-A API foi construída com [FastApi](https://fastapi.tiangolo.com/), que possuí uma excelente validação de tipos, tanto de entrada como de saída da API, usando [Pydantic](https://pydantic-docs.helpmanual.io/). Além disso `FastApi` documenta automaticamente a API utlizando [OpenAPI](https://github.com/OAI/OpenAPI-Specification).
+The API was built with [FastApi](https://fastapi.tiangolo.com/), which has excellent type validation, both for input and output of the API, using [Pydantic](https://pydantic-docs.helpmanual.io/). In addition, `FastApi` automatically documents the API using [OpenAPI](https://github.com/OAI/OpenAPI-Specification).
 
-O projeto foi documentado utilizando [Sphinx](https://www.sphinx-doc.org/en/master/), a documentação pode ser acessada em [Docs](http://localhost:7000/)
+The project was documented using [Sphinx](https://www.sphinx-doc.org/en/master/), the documentation can be accessed at [Docs](http://localhost:4090/)
 
-## Pré-requisitos
+## Prerequisites
 
-Para o funcionamento do projeto é necessária a geração de um chave criptográfica assimétrica, para isso é possível utilizar a função [generate_key](user-api/user_api/utlis/cryptography.py) e exportar a chave como variável de ambiente com o nome `SECRET_KEY no terminal que vai executá-lo
+For the project to work, you need to generate an asymmetric cryptographic key. To do this, you can use the [generate_key](user-api/user_api/utlis/cryptography.py) function and export the key as an environment variable with the name `SECRET_KEY in the terminal that will run it
 
-É preciso configurar o [docker](https://docs.docker.com/) e o [docker-compose](https://docs.docker.com/compose/) para consumir o projeto.
+You need to configure [docker](https://docs.docker.com/) and [docker-compose](https://docs.docker.com/compose/) to consume the project.
 
-As variáveis de ambiente utilizadas pelos containers estão configuradas no arquivo [docker-compose.yml](docker-compose.yml), e são exatamente as mesmas configuradas no arquivo [config.py](order-api/order_api/config.py) contendo as variáveis de conexão com o banco de dados e a `SECRET_KEY` para criptografar os dados antes de gravá-los no banco de dados.
+The environment variables used by the containers are configured in the file [docker-compose.yml](docker-compose.yml), and are exactly the same as those configured in the file [config.py](user-api/user_api/config.py) containing the database connection variables and the `SECRET_KEY` to encrypt the data before writing it to the database.
 
-### Instalação e Execução
+### Installation and Execution
 
-Clone o repositório do projeto, e na pasta `user-api`, siga as instruções abaixo.
+Clone the project repository, and in the `user-api` folder, follow the instructions below.
 
-O projeto conta com um [Makefile](https://en.wikipedia.org/wiki/Make_(software)#Makefile) para automatizar a execução do projeto. Para executar o projeto utilize o seguinte comando:
+The project has a [Makefile](https://en.wikipedia.org/wiki/Make_(software)#Makefile) to automate the execution of the project. To run the project, use the following command:
 
 ```bash
 make run
 ```
 
-Através deste comando é possível _buildar_ as imagens e executar o projeto.
+With this command you can _build_ the images and run the project.
 
-Com a aplicação no ar, basta acessar o [ReDoc](http://localhost:7000/v1/docs) para saber como utilizar cada um dos *endpoints* e para utilizar os *endpoints* acesse o [Swagger](http://localhost:7000/v1/swagger).
+Once the application is live, simply go to [ReDoc](http://localhost:4090/v1/docs) to find out how to use each of the *endpoints* and to use the *endpoints* go to [Swagger](http://localhost:4090/v1/swagger).
 
-## Executando testes
+## Running tests
 
-Os testes da aplicação realizam a validação da lógica negocial da aplicação, verificando se as funções e módulos se comportam conforme esperado.
+Application tests validate the application's business logic, checking that functions and modules behave as expected.
 
-O ideal é que os testes sejam executados de forma _dockerizada_, para tanto,  é preciso que os _containers_ da API e do banco de dados estejam em execução, o que pode ser feito seguindo as instruções em [Instalação e Execução]().
+Ideally, tests should be run in a _dockerized_ way, so the API and database _containers_ need to be running, which can be done by following the instructions in [Installation and Execution]().
 
-Com o container da API nomeado como `user-api`, execute:
+With the API container named `user-api`, run:
 
 ```bash
 docker container exec -it user-api pytest -v
 ```
 
-### Estilo de código
+### Code style
 
-Esse código segue o padrão PEP8 e pode ser testado com a biblioteca [PyLama](https://github.com/klen/pylama) como no exemplo a seguir
+This code follows the PEP8 standard and can be tested with the [PyLama](https://github.com/klen/pylama) library as in the following example
 
 ```bash
 make lint
@@ -56,7 +56,7 @@ make lint
 
 ### Autoformatter
 
-O projeto conta com o [Black](https://github.com/psf/black) que é um `autoformatter`, formatando o código caso exista algum trecho de código que não siga a PEP8. Para executá-lo basta rodar o seguinte comando no terminal:
+The project has [Black](https://github.com/psf/black) which is an `autoformatter`, formatting the code if there is any piece of code that does not follow PEP8. To run it, just run the following command in the terminal:
 
 ```bash
 make black
@@ -64,9 +64,9 @@ make black
 
 ## Deploy
 
-Com a aplicação _dockerizada_ e testada, é possível efetuar o _deploy_ em um orquestrador de _containers_ a exemplo do [Kubernetes](https://kubernetes.io/pt/), ou mesmo, com o orquestrador nativo do Docker [Swarm](https://docs.docker.com/engine/swarm/).
+Once the application has been _dockerized_ and tested, you can _deploy_ it to a _container_ orchestrator such as [Kubernetes](https://kubernetes.io/pt/), or even to the native Docker [Swarm] orchestrator(https://docs.docker.com/engine/swarm/).
 
-## Construído Com
+## Built with
 
 * [black](https://github.com/psf/black)
 * [loguru](https://github.com/Delgan/loguru)
@@ -78,14 +78,14 @@ Com a aplicação _dockerizada_ e testada, é possível efetuar o _deploy_ em um
 * [requests](https://requests.readthedocs.io/en/master/)
 * [sphinx](https://www.sphinx-doc.org/en/master/)
 
-## Versionamento
+## Versioning
 
-O versionamento segue o padrão do [Versionamento Semântico](http://semver.org/).
+Versioning follows the standard of [Semantic Versioning](http://semver.org/).
 
 ## License
 
-Todos os direitos são reservados ao autor Kevin de Santana Araujo.
+All rights are reserved to the author Kevin de Santana Araujo.
 
-## Outras informações
+## Other information
 
-* Caso tenha alguma dúvida em relação ao projeto, ou queira contribuir com sugestões ou críticas, abra uma [issue]() ou procure o desenvolvedor através do email kevin_santana.araujo@hotmail.com
+* If you have any questions about the project, or would like to contribute suggestions or criticism, please open an [issue]() or contact the developer at kevin_santana.araujo@hotmail.com.

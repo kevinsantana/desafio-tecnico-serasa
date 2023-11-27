@@ -16,12 +16,12 @@ from user_api.database.database_service import DatabaseService
 
 def insert_user(user: user_entity) -> int:
     """
-    Insere um usuário no banco de dados, criptografando dados sensíveis. Sanitiza
-    os dados de cpf e telefone, retirando caracteres não númericos.
+    Inserts a user into the database, encrypting sensitive data. Sanitizes
+    the cpf and phone data, removing non-numeric characters.
 
-    :param user_entity user: Instância da classe :class:`entities.user.User`.
-    :raises UserAlreadyInserted: O número de cpf informado já existe na base.
-    :return: Id do usuário inserido no banco de dados.
+    :param user_entity user: Instance of the class :class:`entities.user.User`.
+    :raises UserAlreadyInserted: The cpf number entered already exists in the database.
+    :return: Id of the user inserted into the database.
     :rtype: int
     """
     with DatabaseService() as conn:
@@ -34,10 +34,10 @@ def insert_user(user: user_entity) -> int:
             raise UserAlreadyInserted(
                 status=409,
                 error="Conflict",
-                message="Dado repetido",
+                message="Repeated data",
                 error_details=[
                     ErrorDetails(
-                        message=f"O campo {user.to_dict(no_fk=False)} é repetido"
+                        message=f"The field {user.to_dict(no_fk=False)} is repeated"
                     ).to_dict()
                 ],
             )
@@ -45,13 +45,13 @@ def insert_user(user: user_entity) -> int:
 
 def update_user(id_user: int, update_data: dict) -> bool:
     """
-    Atualiza um usuário.
+    Updates a user.
 
-    :param int id_user: Id do usuário a ser atualizado.
-    :param dict update_data: Dicionário no formato coluna: valor dos dados que
-    serão atualizados.
-    :raises UpdateUserException: O usuário não foi encontrado na base dados.
-    :return: True se o usuário for atualizado com sucesso.
+    :param int id_user: Id of the user to be updated.
+    :param dict update_data: Dictionary in column format: value of the data that
+        to be updated.
+    :raises UpdateUserException: The user was not found in the database.
+    :return: True if the user was successfully updated.
     :rtype: bool
     """
     with DatabaseService() as conn:
@@ -79,22 +79,20 @@ def update_user(id_user: int, update_data: dict) -> bool:
             raise UpdateUserException(
                 status=404,
                 error="Not Found",
-                message="Usuário não encontrado",
+                message="User not found",
                 error_details=[
-                    ErrorDetails(
-                        message=f"Erro ao atualizar usuário {id_user}"
-                    ).to_dict()
+                    ErrorDetails(message=f"Failed to update user: {id_user}").to_dict()
                 ],
             )
 
 
 def delete_user(id_user: int) -> bool:
     """
-    Deleta um usuário.
+    Deletes a user.
 
-    :param int id_user: Usuário a ser deletado.
-    :raises DeleteUserException: O usuário informado não pode ser encontrado.
-    :return: True se o usuário for deletado com sucesso.
+    :param int id_user: User to be deleted.
+    :raises DeleteUserException: The user entered cannot be found.
+    :return: True if the user is successfully deleted.
     :rtype: bool
     """
     with DatabaseService() as conn:
@@ -107,23 +105,21 @@ def delete_user(id_user: int) -> bool:
             raise DeleteUserException(
                 status=404,
                 error="Not Found",
-                message="Usuário não encontrado",
+                message="User not found",
                 error_details=[
-                    ErrorDetails(
-                        message=f"Erro ao deletar o usuário {id_user}"
-                    ).to_dict()
+                    ErrorDetails(message=f"Failed to delete user: {id_user}").to_dict()
                 ],
             )
 
 
 def list_one(id_user: int) -> user_entity:
     """
-    Retorna o usuário a partir do seu id. Descriptografando os dados recuperados
-    do banco de dados.
+    Returns the user from their id. Decrypting the data retrieved
+    from the database.
 
-    :param int id_user: Id do usuário.
-    :raises GetUserException: O usuário informado não foi encontrado.
-    :return: Instância da classe :class:`entities.user.User`.
+    :param int id_user: User id.
+    :raises GetUserException: The user entered was not found.
+    :return: Instance of class :class:`entities.user.User`.
     :rtype: :class:`entities.user.User`.
     """
     with DatabaseService() as conn:
@@ -146,12 +142,12 @@ def list_one(id_user: int) -> user_entity:
 
 def list_all(quantity: int, page: int) -> list:
     """
-    Lista todos os usuários da base, paginando o resultado. Descriptografando os
-    dados recuperados no banco de dados.
+    Lists all users in the database, paginating the result. Decrypting the
+    retrieved data in the database.
 
-    :param int quantity: Quantidade de usuários por página.
-    :param int page: Página do resultado.
-    :return: Lista com todos os usuários encontrados no banco de dados.
+    :param int quantity: Number of users per page.
+    :param int page: Result page.
+    :return: List of all users found in the database.
     :rtype: list
     """
     with DatabaseService() as conn:

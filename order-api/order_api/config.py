@@ -16,7 +16,7 @@ class Envs(BaseSettings):
     DB_HOST: str = "db_orders"
     DB_PORT: str = 9200
     ENVIRONMENT: Optional[Enum] = EnvironmentEnum.PROD
-    USER_API_ADDRESS: str = "http://user_api:7000"
+    USER_API_ADDRESS: str = "http://user_api:4090"
     REDIS_URL = os.getenv("REDIS_URL", "redis")
 
     class Config:
