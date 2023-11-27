@@ -25,7 +25,7 @@ router = APIRouter()
 @router.post(
     "/{index}/{doc_type}/{id}",
     status_code=201,
-    summary="Enter a new order",
+    summary="Insert a new order",
     response_model=InsertOrderResponse,
     responses=INSERT_ORDER_DEFAULT_RESPONSES,
 )
