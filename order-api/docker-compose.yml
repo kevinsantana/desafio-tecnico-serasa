@@ -12,7 +12,6 @@ services:
     working_dir: /deploy
     command: >
         bash -cx "cd order_api/docs; make clean; make html; cd .. &&
-        cd order_api &&
         gunicorn --workers=3 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --reload --bind=0.0.0.0:3090 'app:start_application()'"
     ports:
       - 3090:3090

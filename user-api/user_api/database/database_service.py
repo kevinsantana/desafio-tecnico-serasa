@@ -42,22 +42,22 @@ class DatabaseService:
 
     def __init__(self):
         logger.info(f"db url {envs.SQLALCHEMY_URI}")
-        self._sessao = SessionLocal()
+        self._session = SessionLocal()
 
     @property
     def query(self):
-        return self._sessao.query
+        return self._session.query
 
     @property
     def add(self):
-        return self._sessao.add
+        return self._session.add
 
     @property
     def remove(self):
-        return self._sessao.delete
+        return self._session.delete
 
     def commit(self):
-        self._sessao.commit()
+        self._session.commit()
 
     def __enter__(self):
         return self
@@ -65,8 +65,8 @@ class DatabaseService:
     def __exit__(self, except_type, except_value, except_table):
         if except_type and issubclass(except_type, Exception):
             logger.error(f"{except_type}: {except_value}")
-            self._sessao.rollback()
-        self._sessao.close()
+            self._session.rollback()
+        self._session.close()
 
 
 class DataBaseCrud:

@@ -1,28 +1,41 @@
-FROM centos/python-38-centos7
+FROM python:3.8-slim as builder
 
-USER root
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential gcc libpq-dev
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY setup.py .
+COPY README.md .
+COPY ./user_api /app/user_api
+COPY ./user_api/docs /app/user_api/docs
+COPY setup.py /app
+COPY /tests /app/tests
+COPY README.md /app
+
+RUN pip install --no-cache-dir -e .
+
+COPY . .
+
+# final stage
+FROM python:3.8-slim
 
 # ENVS
 ENV SECRET_KEY=$SECRET_KEY
 
-# DEPENDENCIES
-RUN yum install -y \
-        postgresql-devel\
-        poppler-utils \
-        zlib-devel \
-        libpq-devel
-RUN pip install --upgrade pip
-RUN yum clean all
+WORKDIR /app
 
-# INSTALL APPLICATION
-COPY ./user_api /deploy/user_api
-COPY ./docs /deploy/docs
-COPY setup.py /deploy
-COPY /tests /deploy/tests
-COPY README.md /deploy
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential gcc libpq-dev
 
-WORKDIR /deploy
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app/ .
 
-RUN pip install -e . 
+ENV PATH="/opt/venv/bin:$PATH"
 
-EXPOSE 7000
+EXPOSE 4090
+
+CMD ["gunicorn", "--bind=0.0.0.0:4090", "--workers=3", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=174000", "app:start_application()"]

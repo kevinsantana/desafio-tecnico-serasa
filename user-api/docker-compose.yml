@@ -10,14 +10,13 @@ services:
     environment: 
       - SECRET_KEY
     volumes:
-      - .:/deploy
-    working_dir: /deploy
+      - .:/app
+    working_dir: /app
     command: >
-        bash -cx "cd docs; make clean; make html; cd .. &&
-        cd user_api &&
-        gunicorn --workers=3 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --bind=0.0.0.0:7000 'app:start_application()'"
+        bash -cx "cd user_api/docs; make clean; make html; cd .. &&
+        gunicorn --workers=3 --worker-class=uvicorn.workers.UvicornWorker --timeout=174000 --bind=0.0.0.0:4090 'app:start_application()'"
     ports:
-      - 7000:7000
+      - 4090:4090
     networks:
       - user-network
     depends_on:

@@ -1,24 +1,39 @@
-FROM centos/python-38-centos7
+FROM python:3.8-slim as builder
 
-USER root
+WORKDIR /app
 
-# DEPENDENCIES
-RUN yum install -y \
-        poppler-utils \
-        zlib-devel \
-        libpq-devel
-RUN pip install --upgrade pip
-RUN yum clean all
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential gcc libpq-dev
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 # INSTALL APPLICATION
-COPY ./order_api /deploy/order_api
-COPY ./docs /deploy/docs
-COPY setup.py /deploy
-COPY /tests /deploy/tests
-COPY README.md /deploy
+COPY setup.py .
+COPY README.md .
+COPY ./order_api /app/order_api
+COPY ./docs /app/docs
+COPY setup.py /app
+COPY /tests /app/tests
+COPY README.md /app
 
-WORKDIR /deploy
+RUN pip install --no-cache-dir -e .
 
-RUN pip install -e . 
+COPY . .
+
+# final stage
+FROM python:3.8-slim
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential gcc libpq-dev
+
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app/ .
+
+ENV PATH="/opt/venv/bin:$PATH"
 
 EXPOSE 3090
+
+CMD ["gunicorn", "--bind=0.0.0.0:3090", "--workers=3", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=174000", "app:start_application()"]
